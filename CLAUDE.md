@@ -22,14 +22,17 @@ Single-page AI-300 practice app. No backend, no accounts, nothing is persisted (
 - Do not store answers or progress anywhere. Every session starts fresh by design.
 
 ## Keep these stable (the flow test depends on them)
-Element ids: `#start #sim #simsyn #syn #synn #synonly #syndrop #domdrop #domsum #avail #cnt1..#cnt5 #n #m1 #m2 #sh #sub #next #back #hintBtn #quit #clock #retry #again #theme`.
-Classes and attributes: `.score`, `.meta`, `.syn-badge`, `.serbtn[data-ser]`, `.casebtn[data-case]`, `input[name=ans]`.
+Element ids: `#start #sim #simsyn #syn #synn #synonly #syndrop #domdrop #domsum #avail #cnt1..#cnt5 #n #m1 #m2 #sh #check #next #back #review #hintBtn #hintBox #quit #clock #resume #finish #counts #left #retry #again #ringn #theme`, plus `#s0..` (dropdowns) and `#iA..` (options).
+Classes and attributes: `.score`, `.meta`, `.syn-badge`, `.serbtn[data-ser]`, `.casebtn[data-case]`, `input[name=ans]`, `.qcount`, `.card`, `.feedback`, `.verdict`, `.opt.right`, `.opt.wrong`, `.hint`, `.qgrid button[data-i]` (with its `aria-label`; the last child is the state mark), `.legend li`, `.res-top`, `.section-title`, `.dom .vl`, `details.rev[data-status]`.
 If you must rename one, update `tests/flow.test.js` in the same change.
 
 ## Behaviour rules
 - Synthetic questions always carry the orange "Synthetic" tag and `syn: true`. Never show them without it.
 - The exam simulation always runs in Exam mode: Back allowed, clock on, hints off. With "Use synthetic questions" on it is 50 singles (domain mix 10/14/11/7/8) plus one Yes/No series (3) plus one case study (5). With it off it is 50 original bank questions only.
-- Practice mode scores only answered questions. Exam mode and the simulation split results into Answered correctly, Answered incorrectly and Not answered; the headline score is correct out of answered, and domain bars count answered questions only. Simulation runs also show a "Full-exam estimate" with unanswered questions counted as wrong. Review order is Incorrect (only the first item open), Not answered, Correct. Retry covers the incorrect ones.
+- Practice mode has Back, Check answer, Next, Review and the hint. Check answer needs a pick (every blank on a dropdown question), locks the question and shows the correct answer with feedback; a revisited checked question stays locked. Next never reveals anything and keeps the pick.
+- Exam mode and the simulation have Back, Next and Review, never Check answer. Exam mode outside the simulation keeps the hint.
+- Review (every mode) opens a grid of numbered buttons (answered, not answered, current; in Practice also checked correct or incorrect). Each state has a mark and an `aria-label`, not only a color. Next on the last question opens it. The clock keeps running there. Finishing happens from this screen (`#finish`) or with End session from anywhere.
+- All modes score the same way: results split into Answered correctly, Answered incorrectly and Not answered, checked or not; the headline score is correct out of answered, and domain bars count answered questions only. A partly filled dropdown question counts as answered. Simulation runs also show a "Full-exam estimate" with unanswered questions counted as wrong. Review order is Incorrect (only the first item open), Not answered, Correct. Retry covers the incorrect ones.
 - Respect `prefers-reduced-motion`. Motion answers a user action (question change, answer reveal, results ring and bars); no decorative loops.
 - Check the UI at 420 px wide: no horizontal scroll.
 

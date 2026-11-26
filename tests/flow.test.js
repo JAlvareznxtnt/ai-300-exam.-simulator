@@ -12,6 +12,29 @@ const URL = require('url').pathToFileURL(path.join(__dirname, '..', 'dist', 'ind
     if(q.type==='slots'){ for(let k=0;k<q.slots.length;k++){ const s=q.slots[k]; await p.selectOption('#s'+k,right?s.correct:s.choices.find(c=>c!==s.correct)); } }
     else { const picks=right?q.correct:[q.opts.map(o=>o[0]).find(L=>!q.correct.includes(L))]; for(const L of picks) await p.check('#i'+L,{force:true}); }
   };
+  const count=sel=>p.locator(sel).count();
+  const where=async()=>Number((await p.textContent('.qcount')).match(/Question (\d+)/)[1]);
+  const picks=()=>p.evaluate(()=>[...document.querySelectorAll('input[name=ans]:checked, select')].map(x=>x.value));
+  const wide=()=>p.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
+  // answers every question from the current one with Next, until the review screen opens
+  const walk=async(skip=[],each)=>{ for(let k=1;;k++){ if(each) await each(k); if(!skip.includes(k)) await fill(); await p.click('#next'); if(await p.$('#finish')) return k; } };
+  const assertHidden=async()=>assert.strictEqual(await count('.feedback, .opt.right, .opt.wrong'),0,'nothing is revealed');
+  const assertLocked=async(verdict)=>{
+    assert.strictEqual((await p.textContent('.verdict')).trim(),verdict);
+    assert.ok(await p.evaluate(()=>[...document.querySelectorAll('input[name=ans], select')].every(x=>x.disabled)),'answers are locked');
+    assert.ok(await p.isDisabled('#check')); assert.strictEqual(await count('#hintBtn'),0);
+  };
+  const review=async()=>{
+    const r=await p.evaluate(()=>{ const btns=[...document.querySelectorAll('.qgrid button')]; return {
+      labels:btns.map(x=>x.getAttribute('aria-label')), marks:btns.map(x=>x.lastElementChild.textContent),
+      smallest:Math.min(...btns.map(x=>Math.min(x.offsetWidth,x.offsetHeight))),
+      legend:[...document.querySelectorAll('.legend li')].map(x=>x.lastChild.textContent),
+      counts:document.getElementById('counts').textContent, left:document.getElementById('left')?.textContent??null,
+      resume:document.getElementById('resume').textContent
+    }; });
+    assert.ok(r.smallest>=44,'tap targets are at least 44px: '+r.smallest); assert.strictEqual(await wide(),false,'no horizontal scroll on review');
+    return r;
+  };
   const results=()=>p.evaluate(()=>({
     score:document.querySelector('.score').textContent.trim().replace(/\s+/g,' '),
     top:document.querySelector('.res-top').textContent.replace(/\s+/g,' '),
@@ -21,10 +44,10 @@ const URL = require('url').pathToFileURL(path.join(__dirname, '..', 'dist', 'ind
     retry:document.getElementById('retry').textContent, retryOff:document.getElementById('retry').disabled,
     wide:document.documentElement.scrollWidth>document.documentElement.clientWidth
   }));
-  // checks the results of an Exam mode or simulation run
-  const checkExam=async(total,answered,sim)=>{
-    const r=await results(); const count=s=>r.rev.filter(x=>x.s===s).length;
-    const right=count('correct'), wrong=count('incorrect'), skip=count('unanswered');
+  // checks a results screen; every mode scores the same way, only the simulation adds the estimate
+  const checkResults=async(total,answered,sim)=>{
+    const r=await results(); const n=s=>r.rev.filter(x=>x.s===s).length;
+    const right=n('correct'), wrong=n('incorrect'), skip=n('unanswered');
     assert.strictEqual(right+wrong,answered,'answered count'); assert.strictEqual(skip,total-answered,'not answered count');
     assert.ok(r.score.startsWith(`${right} / ${answered} `),'headline score: '+r.score);
     assert.deepStrictEqual(r.heads,['By domain',`Answered incorrectly (${wrong})`,`Not answered (${skip})`,`Answered correctly (${right})`]);
@@ -39,43 +62,99 @@ const URL = require('url').pathToFileURL(path.join(__dirname, '..', 'dist', 'ind
   };
   // setup
   await p.goto(URL);
-  0;
   console.log('avail off:',await p.textContent('#avail'));
   await p.check('#syn'); console.log('avail on:',await p.textContent('#avail'), '| cnt1:',(await p.textContent('#cnt1')).trim());
   // original + synthetic, exam mode, all questions, with back
   await p.fill('#n','999'); await p.check('#m2'); await p.uncheck('#sh'); await p.click('#start');
-  let n=0, syn=0;
-  for(;;){
-    if(await p.$('#clock')) console.log('clock in non-sim?!');
-    if(await p.$('.syn-badge.chip,.meta .syn-badge')) syn++;
-    n++;
-    if(n===3){ await fill(); await p.click('#sub'); await p.click('#back'); const checked=await p.evaluate(()=>[...document.querySelectorAll('input[name=ans]:checked,select')].length); console.log('back prefilled ok'); await p.click('#sub'); /* to q3 again */ }
-    const lab=await p.textContent('#sub'); await fill(); await p.click('#sub'); if(lab.trim()==='Finish') break;
-  }
-  console.log('orig+syn exam questions seen',n,'synthetic seen',syn,'|',(await p.textContent('.score')).trim());
-  await checkExam(n+1,n+1,false); /* the Back step covers two questions in one pass */
-  console.log((await p.textContent('.card .small:nth-of-type(1)')).trim().slice(0,120));
-  // sim
+  let syn=0;
+  const all=await walk([],async k=>{
+    assert.strictEqual(await count('#clock'),0,'no clock outside the simulation');
+    if(await p.$('.meta .syn-badge')) syn++;
+    if(k===1) assert.strictEqual(await count('#back'),0);
+    if(k===3){
+      assert.strictEqual(await count('#check'),0); assert.strictEqual(await count('#review'),1);
+      await fill(); const was=await picks(); await p.click('#next'); await p.click('#back');
+      assert.strictEqual(await where(),3); assert.deepStrictEqual(await picks(),was,'Back keeps the pick');
+    }
+  });
+  let g=await review();
+  assert.strictEqual(g.labels.length,all); assert.strictEqual(g.left,null); assert.strictEqual(g.counts,`${all} answered · 0 not answered`);
+  await p.click('#finish');
+  console.log('orig+syn exam questions seen',all,'synthetic seen',syn,'|',(await p.textContent('.score')).trim());
+  await checkResults(all,all,false);
+  // simulation, leaving question 5 unanswered
   await p.goto(URL); await p.click('#sim');
-  const kinds={series:0,casestudy:0,synthetic:0}; const doms={}; let total=0;
-  const t=await p.textContent('.meta'); console.log('sim meta:',t.trim().slice(0,80));
-  for(;;){
-    const meta=await p.textContent('.meta'); total++;
+  const kinds={series:0,casestudy:0,synthetic:0};
+  console.log('sim meta:',(await p.textContent('.meta')).trim().slice(0,80));
+  const total=await walk([5],async k=>{
+    const meta=await p.textContent('.meta');
     if(/Yes\/No series/.test(meta)) kinds.series++; if(/Case study/.test(meta)) kinds.casestudy++; if(/Synthetic/.test(meta)) kinds.synthetic++;
-    const lab=await p.textContent('#sub'); if(total===10){ await p.waitForTimeout(1200); console.log('clock',await p.textContent('#clock')); console.log('hint btn in sim:',!!(await p.$('#hintBtn'))); }
-    if(total!==5) await fill(); /* leave Q5 unanswered */
-    if(total===58) 0;
-    await p.click('#sub'); if(lab.trim()==='Finish') break;
-  }
+    if(k!==10) return;
+    assert.strictEqual(await count('#hintBtn, #check'),0,'no hint or Check answer in the simulation'); await assertHidden();
+    await p.click('#review');
+    const before=await p.textContent('#clock'); await p.waitForTimeout(1200);
+    assert.notStrictEqual(await p.textContent('#clock'),before,'clock keeps running on the review screen');
+    const r=await review();
+    assert.strictEqual(r.labels[0],'Question 1, answered'); assert.strictEqual(r.labels[4],'Question 5, not answered');
+    assert.strictEqual(r.labels[9],'Question 10, not answered, current');
+    assert.deepStrictEqual(r.legend,['Answered','Not answered','Current']);
+    assert.strictEqual(r.counts,'8 answered · 50 not answered'); assert.strictEqual(r.left,'50 not answered');
+    assert.strictEqual(r.resume,'Back to question 10');
+    await p.click('#resume'); assert.strictEqual(await where(),10);
+  });
   console.log('sim total',total,kinds);
-  console.log((await p.textContent('.card')).trim().replace(/\s+/g,' ').slice(0,400));
-  await checkExam(total,total-1,true);
-  0;
+  assert.strictEqual(total,58); assert.deepStrictEqual(kinds,{series:3,casestudy:5,synthetic:58});
+  g=await review(); assert.strictEqual(g.left,'1 not answered');
+  await p.click('.qgrid button[data-i="4"]'); assert.strictEqual(await where(),5); assert.deepStrictEqual((await picks()).filter(v=>v),[]);
+  await p.click('#review'); await p.click('#finish');
+  console.log((await p.textContent('.card')).trim().replace(/\s+/g,' ').slice(0,300));
+  await checkResults(total,total-1,true);
+  // practice navigation: Check answer, Next, Back and the review screen
+  await p.goto(URL); await p.fill('#n','5'); await p.check('#m1'); await p.click('#start');
+  assert.ok(await p.isDisabled('#check'),'Check answer waits for a pick'); assert.strictEqual(await count('#back'),0);
+  await answer(false); assert.ok(await p.isEnabled('#check')); const first=await picks();
+  await p.click('#next'); await assertHidden(); await p.click('#back');
+  assert.deepStrictEqual(await picks(),first,'Next keeps the pick'); await assertHidden(); assert.ok(await p.isEnabled('#check'));
+  await p.click('#check'); await assertLocked('Not quite');
+  await p.click('#next'); await assertHidden();
+  await answer(true); await p.click('#check'); await assertLocked('Correct');
+  await p.click('#back'); await assertLocked('Not quite'); assert.deepStrictEqual(await picks(),first,'a checked question keeps its pick');
+  await p.click('#next'); await assertLocked('Correct'); await p.click('#next');
+  await answer(true); await p.click('#next'); /* Q3 answered, not checked */
+  await p.click('#next'); /* Q4 skipped */
+  await answer(false); await p.click('#next'); /* last question: Next opens the review screen */
+  g=await review();
+  assert.deepStrictEqual(g.labels,['Question 1, checked, incorrect','Question 2, checked, correct','Question 3, answered','Question 4, not answered','Question 5, answered, current']);
+  assert.deepStrictEqual(g.marks,['✕','✓','●','–','●']);
+  assert.deepStrictEqual(g.legend,['Answered','Not answered','Checked, correct','Checked, incorrect','Current']);
+  assert.strictEqual(g.counts,'4 answered · 1 not answered'); assert.strictEqual(g.left,'1 not answered');
+  await p.click('.qgrid button[data-i="1"]'); assert.strictEqual(await where(),2); await assertLocked('Correct');
+  await p.click('#review'); g=await review();
+  assert.strictEqual(g.labels[1],'Question 2, checked, correct, current'); assert.strictEqual(g.resume,'Back to question 2');
+  await p.click('.qgrid button[data-i="3"]'); await p.click('#hintBtn'); assert.strictEqual(await count('#hintBox .hint'),1);
+  assert.strictEqual(await wide(),false,'no horizontal scroll on a question');
+  await p.click('#review'); await p.click('#finish');
+  assert.deepStrictEqual(await checkResults(5,4,false),{right:2,wrong:2,skip:1});
+  await p.click('#retry');
+  assert.match(await p.textContent('.qcount'),/^Question 1of 2$/); assert.strictEqual(await count('#check'),1);
+  console.log('practice navigation ok');
+  // dropdown and choose-2 questions
+  await p.goto(URL); await p.evaluate(()=>startSession([DATA.find(q=>q.type==='slots'&&q.slots.length>1),DATA.find(q=>q.type==='multi')],{doms:[1,2,3,4,5],n:2,mode:'practice',shuffle:false,withSyn:false}));
+  await p.selectOption('#s0',{index:1}); assert.ok(await p.isDisabled('#check'),'every dropdown must be filled before checking');
+  const part=await picks(); await p.click('#next'); await p.click('#review'); g=await review();
+  assert.deepStrictEqual(g.labels,['Question 1, answered','Question 2, not answered, current']);
+  await p.click('.qgrid button[data-i="0"]'); assert.deepStrictEqual(await picks(),part);
+  await answer(true); await p.click('#check'); await assertLocked('Correct');
+  await p.click('#next'); const box=(await p.$$('input[name=ans]'))[0];
+  await box.check({force:true}); assert.ok(await p.isEnabled('#check')); await box.uncheck({force:true}); assert.ok(await p.isDisabled('#check'));
+  await p.click('#review'); assert.strictEqual((await review()).labels[1],'Question 2, not answered, current');
+  console.log('dropdown and choose-2 ok');
   // series + cases + synthetic only (practice)
   for(const sel of ['.serbtn[data-ser="1"]','.serbtn[data-ser="2"]','.casebtn[data-case="3"]']){
     await p.goto(URL); await p.check('#m1'); await p.click('#syndrop summary'); await p.click(sel);
     const cnt=sel.includes('ser')?3:5;
-    for(let k=0;k<cnt;k++){ await fill(); await p.click('#sub'); if(k===0&&sel.includes('case')) 0; await p.click('#next'); }
+    for(let k=0;k<cnt;k++){ await fill(); await p.click('#check'); await p.click('#next'); }
+    await p.click('#finish'); await checkResults(cnt,cnt,false);
     console.log(sel,'->',(await p.textContent('.score')).trim());
   }
   await p.goto(URL); await p.click('#syndrop summary'); await p.fill('#synn','7'); await p.click('#synonly');
@@ -83,36 +162,33 @@ const URL = require('url').pathToFileURL(path.join(__dirname, '..', 'dist', 'ind
   console.log('width',await p.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]));
   // sim with synthetic off
   await p.goto(URL); await p.uncheck('#simsyn'); console.log('sim btn off:',await p.textContent('#sim'));
-  await p.click('#sim'); let c2=0, synSeen=0, ser2=0;
-  for(;;){ c2++; const meta=await p.textContent('.meta'); if(/Synthetic|Yes\/No|Case study/.test(meta)) synSeen++; const lab=await p.textContent('#sub'); await fill(); await p.click('#sub'); if(lab.trim()==='Finish') break; }
+  await p.click('#sim'); let synSeen=0;
+  const c2=await walk([],async()=>{ if(/Synthetic|Yes\/No|Case study/.test(await p.textContent('.meta'))) synSeen++; });
+  await p.click('#finish');
   console.log('sim off total',c2,'synthetic/series/case seen',synSeen,'|',(await p.textContent('.score')).trim());
-  await checkExam(c2,c2,true);
-  // exam mode ended early: one right, one skipped, one wrong (read on End session), the rest never reached
+  assert.strictEqual(c2,50); assert.strictEqual(synSeen,0);
+  await checkResults(c2,c2,true);
+  // exam mode ended early: one right, one skipped, one wrong (not followed by Next), the rest never reached
   await p.goto(URL); await p.fill('#n','10'); await p.check('#m2'); await p.click('#start');
-  await answer(true); await p.click('#sub'); await p.click('#sub'); await answer(false); await p.click('#quit');
-  assert.deepStrictEqual(await checkExam(10,2,false),{right:1,wrong:1,skip:8});
+  assert.strictEqual(await count('#hintBtn'),1); assert.strictEqual(await count('#check'),0);
+  await answer(true); await p.click('#next'); await p.click('#next'); await answer(false); await p.click('#quit');
+  assert.deepStrictEqual(await checkResults(10,2,false),{right:1,wrong:1,skip:8});
   await p.click('#retry');
-  assert.match(await p.textContent('.qcount'),/^Question 1of 1$/); assert.strictEqual(await p.textContent('#sub'),'Finish');
+  assert.match(await p.textContent('.qcount'),/^Question 1of 1$/); assert.strictEqual(await count('#check'),0);
   // sim ended early, then the retry of the incorrect one runs in practice mode
   await p.goto(URL); await p.click('#sim'); const simN=await p.evaluate(()=>S.qs.length);
-  await answer(true); await p.click('#sub'); await answer(false); await p.click('#quit');
-  assert.deepStrictEqual(await checkExam(simN,2,true),{right:1,wrong:1,skip:simN-2});
+  await answer(true); await p.click('#next'); await answer(false); await p.click('#quit');
+  assert.deepStrictEqual(await checkResults(simN,2,true),{right:1,wrong:1,skip:simN-2});
   await p.click('#retry');
-  assert.match(await p.textContent('.qcount'),/^Question 1of 1$/); assert.strictEqual(await p.textContent('#sub'),'Check answer');
-  // sim ended with nothing answered
-  await p.goto(URL); await p.click('#sim'); await p.click('#quit');
-  await checkExam(simN,0,true); await p.waitForTimeout(1200);
+  assert.match(await p.textContent('.qcount'),/^Question 1of 1$/); assert.strictEqual(await count('#check'),1);
+  // sim ended from the review screen with nothing answered
+  await p.goto(URL); await p.click('#sim'); await p.click('#review'); await p.click('#quit');
+  await checkResults(simN,0,true); await p.waitForTimeout(1200);
   assert.strictEqual(await p.textContent('#ringn'),'–'); assert.match(await p.textContent('.card'),/No questions answered/);
+  // practice ended with nothing answered shows empty results
+  await p.goto(URL); await p.fill('#n','5'); await p.check('#m1'); await p.click('#start'); await p.click('#quit');
+  await checkResults(5,0,false);
   console.log('early-end results ok');
-  // practice mode results are unchanged
-  await p.goto(URL); await p.fill('#n','5'); await p.check('#m1'); await p.click('#start');
-  await answer(false); await p.click('#sub'); await p.click('#next'); await p.click('#quit');
-  const pr=await results();
-  assert.strictEqual(pr.score,'0 / 1 (0%)'); assert.deepStrictEqual(pr.heads,['By domain','Missed questions','Answered correctly']);
-  assert.deepStrictEqual(pr.rev,[{s:'missed',open:true}]); assert.deepStrictEqual(pr.dom,['0/1 (0%)']);
-  assert.match(pr.top,/4 questions were not reached and not counted/); assert.ok(!pr.top.includes('Full-exam estimate'));
-  assert.strictEqual(pr.retry,'Retry the 1 missed');
-  console.log('practice results ok');
   // dropdown checks
   await p.goto(URL);
   console.log('domains open?',await p.evaluate(()=>document.getElementById('domdrop').open),'| summary:',(await p.textContent('#domsum')));

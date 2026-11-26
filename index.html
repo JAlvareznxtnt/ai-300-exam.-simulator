@@ -176,6 +176,19 @@ select:hover:not(:disabled){border-color:var(--blue)}
 .panel .in p{margin:0 0 10px}
 .panel .in ul{margin:0 0 10px;padding-left:22px}
 .quit{margin-top:14px}
+/* review screen: each state has a mark (and border style) as well as a color */
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;padding:0;margin:12px 0 0;font-size:.9rem;color:var(--ink-2)}
+.legend li{display:flex;align-items:center;gap:7px}
+.key{display:grid;place-items:center;min-width:28px;height:28px;padding:0 4px;border:1.5px solid var(--line-2);border-radius:8px;font-weight:800;font-size:.8rem;color:var(--ink)}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px;margin:18px 0 20px}
+.qgrid button{display:grid;place-items:center;align-content:center;min-height:52px;min-width:0;padding:3px 0;line-height:1.15;font-family:var(--font-display);font-weight:800;font-variant-numeric:tabular-nums}
+.qgrid button.answered,.key.answered{background:var(--blue-soft);border-color:var(--blue)}
+.qgrid button.unanswered,.key.unanswered{border-style:dashed}
+.qgrid button.correct,.key.correct{background:var(--good-soft);border-color:var(--good)}
+.qgrid button.incorrect,.key.incorrect{background:var(--bad-soft);border-color:var(--bad)}
+.qgrid button.now,.key.now{border-width:3px;border-color:var(--ink)}
+.qgrid button.now .no,.key.now{text-decoration:underline;text-underline-offset:3px}
+.qgrid button:hover:not(:disabled){box-shadow:0 4px 12px rgba(14,34,56,.14)}
 /* results */
 .res-top{display:grid;gap:20px;align-items:center;grid-template-columns:auto 1fr}
 @media (max-width:520px){.res-top{grid-template-columns:1fr;justify-items:center;text-align:center}}
@@ -406,13 +419,18 @@ function showSetup(prev){
 /* ---------- quiz ---------- */
 function startSession(qs,cfg){
   if(S&&S.timer){clearInterval(S.timer);}
-  S={qs,cfg,i:0,res:[],ans:[],usedHint:false,t0:Date.now(),timer:null,unans:0,lastPct:0};
-  if(cfg.sim){ S.timer=setInterval(()=>{const c=document.getElementById('clock'); if(c){const s=Math.floor((Date.now()-S.t0)/1000); c.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}},1000); }
+  // ans[i] is the current pick for question i; checked[i] marks a Practice question whose answer was revealed.
+  S={qs,cfg,i:0,ans:[],checked:[],t0:Date.now(),timer:null,lastPct:0};
+  if(cfg.sim){ S.timer=setInterval(()=>{const c=document.getElementById('clock'); if(c) c.textContent=clockText();},1000); }
   renderQ();
   window.scrollTo(0,0);
 }
+function clockText(){ const s=Math.floor((Date.now()-S.t0)/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function openQ(i){ S.i=i; renderQ(); window.scrollTo(0,0); }
+function openReview(){ renderReview(); window.scrollTo(0,0); }
 function attr(s){return esc(s).replace(/"/g,'&quot;')}
 function gradeQ(q,p){ return q.type==='slots' ? (p.length===q.slots.length && p.every((v,k)=>v===q.slots[k].correct)) : setEq(p,q.correct); }
+function isAnswered(q,p){ return !!p && (q.type==='slots' ? p.some(v=>v) : p.length>0); }
 function tagsFor(q){
   let h='';
   if(q.syn) h+='<span class="tag syn-badge">Synthetic</span>';
@@ -433,7 +451,7 @@ function contextPanel(q){
   return '';
 }
 function renderQ(){
-  const q=S.qs[S.i]; const total=S.qs.length; const exam=S.cfg.mode==='exam';
+  const i=S.i, q=S.qs[i]; const total=S.qs.length; const practice=S.cfg.mode==='practice';
   const need=q.correct.length;
   let optsHtml='';
   if(q.type==='slots'){
@@ -447,7 +465,7 @@ function renderQ(){
   const from=S.lastPct, to=(S.i/total)*100; S.lastPct=to;
   app.innerHTML=`
     <div class="narrow stage">
-    <div class="qhead meta"><div class="qcount">Question ${S.i+1}<span>of ${total}</span></div><div class="tags">${tagsFor(q)}<span class="chip">${DOMAINS[q.dom]}</span>${S.cfg.sim?'<span id="clock">00:00</span>':''}</div></div>
+    <div class="qhead meta"><div class="qcount">Question ${S.i+1}<span>of ${total}</span></div><div class="tags">${tagsFor(q)}<span class="chip">${DOMAINS[q.dom]}</span>${S.cfg.sim?`<span id="clock">${clockText()}</span>`:''}</div></div>
     <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${S.i}"><i id="prog" style="width:${REDUCE?to:from}%"></i></div>
     ${contextPanel(q)}
     <div class="qcard card ${q.syn?'synq':''}">
@@ -460,62 +478,66 @@ function renderQ(){
     </div>`;
   if(!REDUCE) requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=document.getElementById('prog'); if(b) b.style.width=to+'%';}));
   const actions=document.getElementById('actions');
-  const hintBtn=document.createElement('button'); hintBtn.type='button'; hintBtn.className='ghost'; hintBtn.textContent='Show hint'; hintBtn.id='hintBtn';
-  hintBtn.onclick=()=>{ document.getElementById('hintBox').innerHTML=`<div class="hint"><b>Hint:</b> ${inline(q.hint)}</div>`; hintBtn.disabled=true; S.usedHint=true; };
-  S.usedHint=false;
-  const sub=document.createElement('button'); sub.type='button'; sub.className='primary'; sub.id='sub'; sub.disabled=!exam;
-  sub.textContent=exam?(S.i===total-1?'Finish':'Next'):'Check answer';
-  let read;
-  if(q.type==='slots'){
-    read=()=>[...app.querySelectorAll('select')].map(x=>x.value);
-    app.querySelectorAll('select').forEach(s=>s.addEventListener('change',()=>{ if(!exam) sub.disabled=read().some(v=>!v); }));
-  } else {
-    read=()=>[...app.querySelectorAll('input[name=ans]')].filter(x=>x.checked).map(x=>x.value);
-    app.querySelectorAll('input[name=ans]').forEach(inp=>inp.addEventListener('change',()=>{
-      if(!exam) sub.disabled=read().length===0;
-      app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked));
-    }));
-  }
-  if(exam && S.ans[S.i]){
-    const a=S.ans[S.i];
-    if(q.type==='slots') app.querySelectorAll('select').forEach((s,k)=>{s.value=a[k]||'';});
-    else app.querySelectorAll('input[name=ans]').forEach(inp=>{inp.checked=a.includes(inp.value); inp.closest('.opt').classList.toggle('sel',inp.checked);});
-  }
-  document.getElementById('quit').onclick=()=>{ if(exam){ S.ans[S.i]=read(); finishExam(); } else finish(); };
-  sub.onclick=()=>{
-    const p=read();
-    if(exam){ S.ans[S.i]=p; if(S.i===total-1) return finishExam(); S.i++; renderQ(); window.scrollTo(0,0); return; }
-    const ok=gradeQ(q,p);
-    sub.remove(); hintBtn.remove();
-    if(q.type==='slots'){
-      app.querySelectorAll('select').forEach(x=>x.disabled=true);
-    } else {
-      app.querySelectorAll('.opt').forEach(o=>{
-        const L=o.querySelector('input').value; o.classList.add('locked'); o.querySelector('input').disabled=true;
-        if(q.correct.includes(L)) o.classList.add('right'); else if(p.includes(L)) o.classList.add('wrong');
-      });
-    }
-    document.getElementById('fb').innerHTML=feedback(q,ok,p);
-    const nx=document.createElement('button'); nx.type='button'; nx.className='primary'; nx.id='next'; nx.textContent=S.i===total-1?'See results':'Next question';
-    nx.onclick=()=>record(q,p,ok); actions.append(nx); nx.focus();
+  const button=(id,label,cls,onclick)=>{ const b=document.createElement('button'); b.type='button'; b.id=id; b.textContent=label; b.className=cls; b.onclick=onclick; return b; };
+  const back=i>0?button('back','Back','',()=>openQ(i-1)):null;
+  const hintBtn=S.cfg.sim?null:button('hintBtn','Show hint','ghost',()=>{ document.getElementById('hintBox').innerHTML=`<div class="hint"><b>Hint:</b> ${inline(q.hint)}</div>`; hintBtn.disabled=true; });
+  const review=button('review','Review','ghost',openReview);
+  const check=practice?button('check','Check answer','primary',()=>{ S.checked[i]=true; reveal(); next.focus(); }):null;
+  const next=button('next','Next',practice?'':'primary',()=>{ if(i===total-1) openReview(); else openQ(i+1); });
+  const fields=[...app.querySelectorAll(q.type==='slots'?'select':'input[name=ans]')];
+  const read=()=>q.type==='slots'? fields.map(x=>x.value) : fields.filter(x=>x.checked).map(x=>x.value);
+  const paint=()=>app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked));
+  // Check answer waits for a pick; a dropdown question needs every blank filled.
+  const ready=()=>q.type==='slots'? read().every(v=>v) : read().length>0;
+  // Locks a checked Practice question and shows the correct answer with its feedback.
+  const reveal=()=>{
+    const p=S.ans[i];
+    fields.forEach(x=>x.disabled=true);
+    app.querySelectorAll('.opt').forEach(o=>{
+      const L=o.querySelector('input').value; o.classList.add('locked');
+      if(q.correct.includes(L)) o.classList.add('right'); else if(p.includes(L)) o.classList.add('wrong');
+    });
+    document.getElementById('fb').innerHTML=feedback(q,gradeQ(q,p),p);
+    if(hintBtn) hintBtn.remove();
+    check.disabled=true; check.className=''; next.className='primary';
   };
-  if(exam && S.i>0){
-    const back=document.createElement('button'); back.type='button'; back.id='back'; back.textContent='Back';
-    back.onclick=()=>{ S.ans[S.i]=read(); S.i--; renderQ(); window.scrollTo(0,0); };
-    actions.append(back);
-  }
-  if(!S.cfg.sim) actions.append(hintBtn);
-  const sp=document.createElement('span'); sp.className='spacer'; actions.append(sp);
-  actions.append(sub);
+  const saved=S.ans[i];
+  if(saved){ fields.forEach((x,k)=>{ if(q.type==='slots') x.value=saved[k]||''; else x.checked=saved.includes(x.value); }); paint(); }
+  // Every change is saved at once, so Back, Next, Review and End session all keep the pick.
+  fields.forEach(x=>x.addEventListener('change',()=>{ S.ans[i]=read(); paint(); if(check) check.disabled=!ready(); }));
+  document.getElementById('quit').onclick=finish;
+  const spacer=document.createElement('span'); spacer.className='spacer';
+  actions.append(...[back,hintBtn,review,spacer,check,next].filter(Boolean));
+  if(check){ check.disabled=!ready(); if(S.checked[i]) reveal(); }
 }
-function finishExam(){
-  S.res=S.qs.map((q,i)=>{
-    const a=S.ans[i]; const answered = a && (q.type==='slots'? a.some(v=>v) : a.length>0);
-    const p = answered? a : (q.type==='slots'? q.slots.map(()=>'') : []);
-    return {q,picked:p,ok:answered&&gradeQ(q,p),answered};
-  });
-  S.unans=S.res.filter(x=>!x.answered).length;
-  finish();
+
+/* ---------- review screen ---------- */
+const STATES={answered:{mark:'●',name:'Answered',label:'answered'},unanswered:{mark:'–',name:'Not answered',label:'not answered'},correct:{mark:'✓',name:'Checked, correct',label:'checked, correct'},incorrect:{mark:'✕',name:'Checked, incorrect',label:'checked, incorrect'}};
+function stateOf(i){
+  if(S.checked[i]) return gradeQ(S.qs[i],S.ans[i])?'correct':'incorrect';
+  return isAnswered(S.qs[i],S.ans[i])?'answered':'unanswered';
+}
+function renderReview(){
+  const states=S.qs.map((q,i)=>stateOf(i)); const left=states.filter(s=>s==='unanswered').length;
+  const keys=S.cfg.mode==='practice'?['answered','unanswered','correct','incorrect']:['answered','unanswered'];
+  app.innerHTML=`
+    <div class="narrow stage">
+    <div class="qhead"><h1>Review</h1>${S.cfg.sim?`<span id="clock">${clockText()}</span>`:''}</div>
+    <div class="panel-card" style="margin-top:18px">
+      <p id="counts"><b>${states.length-left}</b> answered · <b>${left}</b> not answered</p>
+      <ul class="legend" aria-label="Legend">${keys.map(k=>`<li><span class="key ${k}" aria-hidden="true">${STATES[k].mark}</span>${STATES[k].name}</li>`).join('')}<li><span class="key now" aria-hidden="true">${S.i+1}</span>Current</li></ul>
+      <div class="qgrid" role="group" aria-label="Questions">${states.map((s,i)=>{const now=i===S.i; return `<button type="button" class="${s}${now?' now':''}" data-i="${i}" aria-label="Question ${i+1}, ${STATES[s].label}${now?', current':''}"${now?' aria-current="step"':''}><span class="no">${i+1}</span><span aria-hidden="true">${STATES[s].mark}</span></button>`;}).join('')}</div>
+      <div class="actions">
+        <button type="button" id="resume">Back to question ${S.i+1}</button><span class="spacer"></span>
+        <div class="actions">${left?`<span class="small" id="left">${left} not answered</span>`:''}<button type="button" class="primary" id="finish">Finish and see results</button></div>
+      </div>
+    </div>
+    <div class="quit"><button type="button" class="ghost" id="quit">End session</button></div>
+    </div>`;
+  app.querySelectorAll('.qgrid button').forEach(b=>b.onclick=()=>openQ(+b.dataset.i));
+  document.getElementById('resume').onclick=()=>openQ(S.i);
+  document.getElementById('finish').onclick=finish;
+  document.getElementById('quit').onclick=finish;
 }
 function slotRows(q,p){
   return `<ul class="slotres">`+q.slots.map((s,k)=>{
@@ -529,36 +551,28 @@ function feedback(q,ok,p){
     ${q.rationale?`<p>${inline(q.rationale.replace(/\n+/g,' '))}</p>`:''}
     ${q.note?`<p class="note">${inline(q.note)}</p>`:''}</div>`;
 }
-function record(q,picked,ok){
-  S.res.push({q,picked,ok,hint:S.usedHint});
-  S.i++;
-  if(S.i>=S.qs.length) finish(); else { renderQ(); window.scrollTo(0,0); }
-}
-
 /* ---------- results ---------- */
 function fmtTime(ms){ const s=Math.floor(ms/1000); return Math.floor(s/60)+' min '+String(s%60).padStart(2,'0')+' s'; }
 function finish(){
   if(S.timer){clearInterval(S.timer);S.timer=null;}
-  const r=S.res; const exam=S.cfg.mode==='exam';
-  if(r.length===0){ showSetup(S.cfg); return; }
-  // Scores cover answered questions only. Practice results only ever hold answered ones.
-  const done=exam?r.filter(x=>x.answered):r;
-  const skipped=exam?r.filter(x=>!x.answered):[];
+  const r=S.qs.map((q,i)=>{
+    const answered=isAnswered(q,S.ans[i]);
+    const picked=answered? S.ans[i] : (q.type==='slots'? q.slots.map(()=>'') : []);
+    return {q,picked,ok:answered&&gradeQ(q,picked),answered};
+  });
+  // Every mode scores answered questions only, whether or not a Practice answer was checked.
+  const done=r.filter(x=>x.answered), skipped=r.filter(x=>!x.answered);
   const correct=done.filter(x=>x.ok), missed=done.filter(x=>!x.ok);
   const n=done.length; const right=correct.length;
   const pct=n?Math.round(right/n*100):0;
   const full=Math.round(right/r.length*100);
   const by={}; done.forEach(x=>{const d=x.q.dom; by[d]=by[d]||{n:0,r:0}; by[d].n++; if(x.ok) by[d].r++;});
-  const notDone=exam?0:S.qs.length-n;
   const syn=done.filter(x=>x.q.syn), org=done.filter(x=>!x.q.syn);
   const group=(title,items,status,open)=>`<h2 class="section-title">${title}</h2>${items.map((x,k)=>reviewItem(x,status,open(k))).join('')||'<p class="small">None.</p>'}`;
   const shut=()=>false;
-  const review=exam
-    ? group(`Answered incorrectly (${missed.length})`,missed,'incorrect',k=>k===0)
-      +group(`Not answered (${skipped.length})`,skipped,'unanswered',shut)
-      +group(`Answered correctly (${right})`,correct,'correct',shut)
-    : `<h2 class="section-title">${missed.length?'Missed questions':'No missed questions'}</h2>${missed.map((x,k)=>reviewItem(x,'missed',k===0)).join('')}`
-      +group('Answered correctly',correct,'correct',shut);
+  const review=group(`Answered incorrectly (${missed.length})`,missed,'incorrect',k=>k===0)
+    +group(`Not answered (${skipped.length})`,skipped,'unanswered',shut)
+    +group(`Answered correctly (${right})`,correct,'correct',shut);
   const split=(syn.length&&org.length)?`<p class="small">Original: ${org.filter(x=>x.ok).length}/${org.length} · <span class="tag syn-badge">Synthetic</span> ${syn.filter(x=>x.ok).length}/${syn.length}</p>`:'';
   const C=2*Math.PI*62;
   app.innerHTML=`
@@ -568,19 +582,18 @@ function finish(){
       <div class="res-top">
         <div class="ring" role="img" aria-label="${n?pct+' percent correct':'No questions answered'}"><svg width="150" height="150" viewBox="0 0 150 150"><circle class="trk" cx="75" cy="75" r="62" fill="none" stroke-width="12"/><circle class="val" id="ringv" cx="75" cy="75" r="62" fill="none" stroke-width="12" stroke-dasharray="${C}" stroke-dashoffset="${REDUCE?C*(1-pct/100):C}" ${n?'':'visibility="hidden"'}/></svg><div class="num" id="ringn">${n?(REDUCE?pct:0)+'%':'–'}</div></div>
         <div>
-          <p class="big score">${right} / ${n} <span class="small">${exam?(n?`answered correctly (${pct}%)`:'(no questions answered)'):`(${pct}%)`}</span></p>
+          <p class="big score">${right} / ${n} <span class="small">${n?`answered correctly (${pct}%)`:'(no questions answered)'}</span></p>
           ${S.cfg.sim?`<p class="small"><b>Full-exam estimate:</b> ${right} / ${r.length} (${full}%), with unanswered questions counted as wrong.</p>
           <p class="small">Time: ${fmtTime(Date.now()-S.t0)}. The real exam is scored out of 1000 with 700 to pass, so treat these percentages as a rough guide only.</p>`:''}
           ${split}
           ${skipped.length?`<p class="small">${skipped.length} question${skipped.length>1?'s were':' was'} not answered and ${skipped.length>1?'are':'is'} not in the score above.</p>`:''}
-          ${notDone>0?`<p class="small">${notDone} question${notDone>1?'s were':' was'} not reached and not counted.</p>`:''}
         </div>
       </div>
       <h2 class="section-title">By domain</h2>
-      ${Object.keys(by).sort().map(d=>{const v=by[d],p=Math.round(v.r/v.n*100); return `<div class="dom"><span class="nm">${DOMAINS[d]}</span><span class="vl">${exam?`${v.n} answered · ${v.r} correct (${p}%)`:`${v.r}/${v.n} (${p}%)`}</span><div class="bar"><i class="${p<60?'low':''}" data-w="${p}" style="width:${REDUCE?p:0}%"></i></div></div>`;}).join('')||'<p class="small">No questions answered.</p>'}
+      ${Object.keys(by).sort().map(d=>{const v=by[d],p=Math.round(v.r/v.n*100); return `<div class="dom"><span class="nm">${DOMAINS[d]}</span><span class="vl">${v.n} answered · ${v.r} correct (${p}%)</span><div class="bar"><i class="${p<60?'low':''}" data-w="${p}" style="width:${REDUCE?p:0}%"></i></div></div>`;}).join('')||'<p class="small">No questions answered.</p>'}
     </div>
     <div class="row" style="margin:18px 0 6px">
-      <button class="primary" id="retry" ${missed.length?'':'disabled'}>Retry the ${missed.length} ${exam?'incorrect':'missed'}</button>
+      <button class="primary" id="retry" ${missed.length?'':'disabled'}>Retry the ${missed.length} incorrect</button>
       <button id="again">Back to setup</button>
     </div>
     ${review}
@@ -600,7 +613,7 @@ function finish(){
 }
 function reviewItem(x,status,open){
   const first=esc(x.q.stem.replace(/\*\*/g,'').split('\n')[0].slice(0,110))+(x.q.stem.length>110?'…':'');
-  const pill={correct:'<span class="pill-good">Correct</span>',missed:'<span class="pill-bad">Missed</span>',incorrect:'<span class="pill-bad">Incorrect</span>',unanswered:'<span class="chip">Not answered</span>'}[status];
+  const pill={correct:'<span class="pill-good">Correct</span>',incorrect:'<span class="pill-bad">Incorrect</span>',unanswered:'<span class="chip">Not answered</span>'}[status];
   return `<details class="rev" data-status="${status}" ${open?'open':''}><summary>${pill}${x.q.syn?'<span class="tag syn-badge">Synthetic</span>':''}<span class="chip">${DOMAINS[x.q.dom]}</span><span class="sumtxt">${first}</span></summary><div class="in">${reviewBody(x)}</div></details>`;
 }
 function reviewBody(x){
