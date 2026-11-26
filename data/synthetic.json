@@ -837,7 +837,9 @@
      "correct": "Estimate the required PTUs for the workload",
      "choices": [
       "Create the provisioned deployment",
+      "Request a tokens-per-minute quota increase for a Standard deployment",
       "Estimate the required PTUs for the workload",
+      "Create a Global Batch deployment for the workload",
       "Purchase an Azure reservation for the deployed PTUs",
       "Verify that PTU capacity is available in the region"
      ]
@@ -848,7 +850,9 @@
      "choices": [
       "Verify that PTU capacity is available in the region",
       "Purchase an Azure reservation for the deployed PTUs",
+      "Request a tokens-per-minute quota increase for a Standard deployment",
       "Create the provisioned deployment",
+      "Create a Global Batch deployment for the workload",
       "Estimate the required PTUs for the workload"
      ]
     },
@@ -859,17 +863,21 @@
       "Purchase an Azure reservation for the deployed PTUs",
       "Create the provisioned deployment",
       "Estimate the required PTUs for the workload",
-      "Verify that PTU capacity is available in the region"
+      "Request a tokens-per-minute quota increase for a Standard deployment",
+      "Verify that PTU capacity is available in the region",
+      "Create a Global Batch deployment for the workload"
      ]
     },
     {
      "label": "Step 4",
      "correct": "Purchase an Azure reservation for the deployed PTUs",
      "choices": [
+      "Create a Global Batch deployment for the workload",
       "Estimate the required PTUs for the workload",
       "Create the provisioned deployment",
       "Verify that PTU capacity is available in the region",
-      "Purchase an Azure reservation for the deployed PTUs"
+      "Purchase an Azure reservation for the deployed PTUs",
+      "Request a tokens-per-minute quota increase for a Standard deployment"
      ]
     }
    ],
@@ -2128,7 +2136,9 @@
        "correct": "Register the training data as an mltable data asset",
        "choices": [
         "Shift traffic to green and delete the blue deployment",
+        "Create the green deployment and route 10% of live traffic to it",
         "Register the training data as an mltable data asset",
+        "Register the training data as a uri_file data asset",
         "Create the green deployment and mirror live traffic to it",
         "Run the training pipeline job with a hyperparameter sweep and MLflow logging",
         "Register the best model in the registry"
@@ -2140,7 +2150,9 @@
        "choices": [
         "Register the best model in the registry",
         "Create the green deployment and mirror live traffic to it",
+        "Create the green deployment and route 10% of live traffic to it",
         "Run the training pipeline job with a hyperparameter sweep and MLflow logging",
+        "Register the training data as a uri_file data asset",
         "Shift traffic to green and delete the blue deployment",
         "Register the training data as an mltable data asset"
        ]
@@ -2152,7 +2164,9 @@
         "Create the green deployment and mirror live traffic to it",
         "Register the best model in the registry",
         "Register the training data as an mltable data asset",
+        "Create the green deployment and route 10% of live traffic to it",
         "Run the training pipeline job with a hyperparameter sweep and MLflow logging",
+        "Register the training data as a uri_file data asset",
         "Shift traffic to green and delete the blue deployment"
        ]
       },
@@ -2164,18 +2178,22 @@
         "Register the best model in the registry",
         "Register the training data as an mltable data asset",
         "Shift traffic to green and delete the blue deployment",
-        "Create the green deployment and mirror live traffic to it"
+        "Create the green deployment and route 10% of live traffic to it",
+        "Create the green deployment and mirror live traffic to it",
+        "Register the training data as a uri_file data asset"
        ]
       },
       {
        "label": "Step 5",
        "correct": "Shift traffic to green and delete the blue deployment",
        "choices": [
+        "Register the training data as a uri_file data asset",
         "Run the training pipeline job with a hyperparameter sweep and MLflow logging",
         "Register the best model in the registry",
         "Shift traffic to green and delete the blue deployment",
         "Create the green deployment and mirror live traffic to it",
-        "Register the training data as an mltable data asset"
+        "Register the training data as an mltable data asset",
+        "Create the green deployment and route 10% of live traffic to it"
        ]
       }
      ],

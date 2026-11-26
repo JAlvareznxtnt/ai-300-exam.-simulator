@@ -153,11 +153,39 @@ pre code{background:none;padding:0}
 .opt.wrong .L{background:var(--bad);color:var(--paper);border-color:var(--bad)}
 .opt.wrong .mk::after{content:"\2715";color:var(--bad)}
 .opt.locked{cursor:default}
-.slots{display:grid;gap:12px;margin-bottom:16px}
-.slot{display:grid;gap:6px;background:var(--mist);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.slot label{font-weight:600}
-select{font:inherit;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:10px;background:var(--paper);color:var(--ink);max-width:100%;transition:border-color .15s}
-select:hover:not(:disabled){border-color:var(--blue)}
+/* drag-and-drop board: option pool, then the slots (side by side when there is room) */
+.dnd{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-bottom:16px;align-items:start}
+@media (min-width:680px){.dnd{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}}
+.pool,.targets{display:grid;gap:8px;align-content:start;min-width:0}
+.pool{background:var(--mist);border:1.5px solid var(--line);border-radius:12px;padding:10px;transition:border-color .15s,background-color .15s}
+.piece,.slotbtn{text-align:left;min-width:0;min-height:46px;padding:9px 12px;line-height:1.4;overflow-wrap:anywhere;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* only things that can be dragged block touch scrolling */
+.piece,.slot.filled .slotbtn{cursor:grab;touch-action:none}
+.piece.used{opacity:.4;touch-action:auto}
+.dnd.locked .piece,.dnd.locked .slot .slotbtn{touch-action:auto}
+.slot{display:grid;gap:6px;min-width:0;background:var(--mist);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;transition:border-color .15s,background-color .15s}
+.sl{font-weight:600;overflow-wrap:anywhere}
+.slotrow{display:flex;gap:8px;align-items:stretch}
+.slotbtn{flex:1}
+.slot:not(.filled) .slotbtn{border:2px dashed var(--line-2);color:var(--ink-2);font-weight:400}
+.slot.filled .slotbtn{border-color:var(--blue)}
+.unslot{flex:none;width:46px;padding:0}
+.slotmk{display:none;flex:none;width:26px;align-self:center;text-align:center;font-weight:800;font-size:1.15rem}
+.dnd .piece.held,.dnd .slot.held .slotbtn{background:var(--blue-soft);border-color:var(--blue);box-shadow:0 0 0 2px var(--blue)}
+.dnd .pool.over,.dnd .slot.over{border-color:var(--blue);background:var(--blue-soft);box-shadow:0 0 0 2px var(--blue)}
+.dnd .slot.over .slotbtn{border-color:var(--blue)}
+.dnd .lifted{opacity:.45}
+.ghost-drag{position:fixed;z-index:30;pointer-events:none;background:var(--paper);color:var(--ink);border:2px solid var(--blue);border-radius:10px;box-shadow:var(--shadow);padding:9px 12px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+.dnd.locked .piece:not(.used),.dnd.locked .slotbtn{opacity:1;cursor:default}
+.dnd.locked .slotmk{display:block}
+.dnd .slot.right{border-color:var(--good);background:var(--good-soft);animation:pop .35s}
+.dnd .slot.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.dnd .slot.right .slotbtn{border-color:var(--good)}
+.dnd .slot.wrong .slotbtn{border-color:var(--bad)}
+.slot.right .slotmk{color:var(--good)}
+.slot.wrong .slotmk{color:var(--bad)}
+.fix{overflow-wrap:anywhere}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .slotres{margin:10px 0;padding-left:20px}
 .slotres li{margin-bottom:4px}
 .feedback{border:1px solid var(--line);border-left:5px solid var(--line-2);padding:14px 16px;margin:0 0 16px;border-radius:12px;background:var(--mist);animation:rise .3s cubic-bezier(.2,.8,.2,1)}
@@ -428,7 +456,6 @@ function startSession(qs,cfg){
 function clockText(){ const s=Math.floor((Date.now()-S.t0)/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 function openQ(i){ S.i=i; renderQ(); window.scrollTo(0,0); }
 function openReview(){ renderReview(); window.scrollTo(0,0); }
-function attr(s){return esc(s).replace(/"/g,'&quot;')}
 function gradeQ(q,p){ return q.type==='slots' ? (p.length===q.slots.length && p.every((v,k)=>v===q.slots[k].correct)) : setEq(p,q.correct); }
 function isAnswered(q,p){ return !!p && (q.type==='slots' ? p.some(v=>v) : p.length>0); }
 function tagsFor(q){
@@ -455,8 +482,7 @@ function renderQ(){
   const need=q.correct.length;
   let optsHtml='';
   if(q.type==='slots'){
-    optsHtml=`<span class="instr">Choose one answer for each item.</span><div class="slots">`+
-      q.slots.map((s,k)=>`<div class="slot"><label for="s${k}">${esc(s.label)}</label><select id="s${k}" data-k="${k}"><option value="">Choose…</option>${s.choices.map(c=>`<option value="${attr(c)}">${esc(c)}</option>`).join('')}</select></div>`).join('')+`</div>`;
+    optsHtml=boardHtml(q);
   } else {
     const kind=q.type==='multi'?'checkbox':'radio';
     optsHtml=`<span class="instr">${q.type==='multi'?`Choose ${need}.`:'Choose one.'}</span><div class="opts" role="group">`+
@@ -484,14 +510,18 @@ function renderQ(){
   const review=button('review','Review','ghost',openReview);
   const check=practice?button('check','Check answer','primary',()=>{ S.checked[i]=true; reveal(); next.focus(); }):null;
   const next=button('next','Next',practice?'':'primary',()=>{ if(i===total-1) openReview(); else openQ(i+1); });
-  const fields=[...app.querySelectorAll(q.type==='slots'?'select':'input[name=ans]')];
-  const read=()=>q.type==='slots'? fields.map(x=>x.value) : fields.filter(x=>x.checked).map(x=>x.value);
+  // Every change is saved to S.ans at once, so Back, Next, Review and End session all keep the pick.
+  const changed=()=>{ if(check) check.disabled=!ready(); };
+  const board=q.type==='slots'?slotBoard(q,i,changed):null;
+  const fields=[...app.querySelectorAll('input[name=ans]')];
+  const read=()=>fields.filter(x=>x.checked).map(x=>x.value);
   const paint=()=>app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked));
-  // Check answer waits for a pick; a dropdown question needs every blank filled.
-  const ready=()=>q.type==='slots'? read().every(v=>v) : read().length>0;
+  // Check answer waits for a pick; a slot question needs every slot filled.
+  const ready=()=>board? board.ready() : read().length>0;
   // Locks a checked Practice question and shows the correct answer with its feedback.
   const reveal=()=>{
     const p=S.ans[i];
+    if(board) board.lock(p);
     fields.forEach(x=>x.disabled=true);
     app.querySelectorAll('.opt').forEach(o=>{
       const L=o.querySelector('input').value; o.classList.add('locked');
@@ -502,13 +532,136 @@ function renderQ(){
     check.disabled=true; check.className=''; next.className='primary';
   };
   const saved=S.ans[i];
-  if(saved){ fields.forEach((x,k)=>{ if(q.type==='slots') x.value=saved[k]||''; else x.checked=saved.includes(x.value); }); paint(); }
-  // Every change is saved at once, so Back, Next, Review and End session all keep the pick.
-  fields.forEach(x=>x.addEventListener('change',()=>{ S.ans[i]=read(); paint(); if(check) check.disabled=!ready(); }));
+  if(saved){ fields.forEach(x=>{ x.checked=saved.includes(x.value); }); paint(); }
+  fields.forEach(x=>x.addEventListener('change',()=>{ S.ans[i]=read(); paint(); changed(); }));
   document.getElementById('quit').onclick=finish;
   const spacer=document.createElement('span'); spacer.className='spacer';
   actions.append(...[back,hintBtn,review,spacer,check,next].filter(Boolean));
   if(check){ check.disabled=!ready(); if(S.checked[i]) reveal(); }
+}
+
+/* ---------- drag-and-drop for slot questions (ordering, matching, code blanks) ---------- */
+// One option pool per question: every choice of every slot, each usable once, in alphabetical order.
+function poolOf(q){ return [...new Set(q.slots.flatMap(s=>s.choices))].sort((a,b)=>a.localeCompare(b)); }
+function boardHtml(q){
+  return `<span class="instr">Drag an option into each slot, or select an option and then a slot.</span>
+    <div class="dnd" id="dnd">
+      <div class="pool" role="group" aria-label="Options">${poolOf(q).map((v,n)=>`<button type="button" class="piece" id="p${n}" data-n="${n}">${esc(v)}</button>`).join('')}</div>
+      <div class="targets" role="group" aria-label="Answer slots">${q.slots.map((s,k)=>`<div class="slot" data-k="${k}"><span class="sl">${esc(s.label)}</span><div class="slotrow"><button type="button" class="slotbtn" id="s${k}"></button><button type="button" class="unslot">✕</button><span class="slotmk" aria-hidden="true"></span></div></div>`).join('')}</div>
+    </div><div class="sr-only" id="live" aria-live="polite"></div>`;
+}
+// Wires the board for question i. The answer stays an array with one value per slot ('' when empty).
+function slotBoard(q,i,changed){
+  const board=document.getElementById('dnd'), live=document.getElementById('live');
+  const values=poolOf(q), pieces=[...board.querySelectorAll('.piece')], slots=[...board.querySelectorAll('.slot')];
+  const ans=()=>S.ans[i]||q.slots.map(()=>'');
+  const name=k=>q.slots[k].label;
+  const say=t=>{ live.textContent=t; };
+  let held=null, locked=false, dragged=false, grabbing=false; // held: the option picked up by click or keyboard, {v, from}
+  const paint=()=>{
+    const a=ans();
+    pieces.forEach((el,n)=>{
+      const v=values[n], at=a.indexOf(v), on=!!held&&held.from===null&&held.v===v;
+      el.classList.toggle('used',at>=0); el.classList.toggle('held',on);
+      el.disabled=locked||at>=0; el.setAttribute('aria-pressed',on);
+      el.setAttribute('aria-label',at>=0?`${v}, placed in ${name(at)}`:v);
+    });
+    slots.forEach((el,k)=>{
+      const v=a[k], on=!!held&&held.from===k, btn=el.querySelector('.slotbtn'), x=el.querySelector('.unslot');
+      el.classList.toggle('filled',!!v); el.classList.toggle('held',on);
+      btn.textContent=v||'Empty'; btn.disabled=locked; btn.setAttribute('aria-pressed',on);
+      btn.setAttribute('aria-label',`${name(k)}: ${v||'empty'}`);
+      x.hidden=locked||!v; x.setAttribute('aria-label',`Remove ${v} from ${name(k)}`);
+    });
+  };
+  // Puts v into slot `to`, or back in the pool. `from` is the slot it came from, null for the pool.
+  // A filled target swaps with the source slot; an option coming from the pool sends the old one back.
+  const move=(v,from,to)=>{
+    held=null;
+    if(to===null||to===from||(to==='pool'&&from===null)){ paint(); return; }
+    const a=ans().slice(); let msg;
+    if(to==='pool'){ a[from]=''; msg=`removed ${v} from ${name(from)}`; }
+    else {
+      const other=a[to]; a[to]=v; if(from!==null) a[from]=other;
+      msg=`placed ${v} in ${name(to)}`+(!other?'':from===null?`, ${other} returned to the pool`:`, moved ${other} to ${name(from)}`);
+    }
+    S.ans[i]=a; paint(); say(msg); changed();
+  };
+  const hold=(v,from)=>{
+    const same=!!held&&held.v===v&&held.from===from;
+    held=same?null:{v,from}; paint();
+    say(same?`${v} deselected`:`${v} selected. Choose a slot.`);
+  };
+  // Click, tap, Enter and Space: select an option, then a slot.
+  board.addEventListener('click',e=>{
+    if(locked||dragged) return;
+    const slot=e.target.closest('.slot'), piece=e.target.closest('.piece');
+    if(e.target.closest('.unslot')){ const k=+slot.dataset.k; move(ans()[k],k,'pool'); slot.querySelector('.slotbtn').focus(); }
+    else if(piece) hold(values[+piece.dataset.n],null);
+    else if(slot){
+      const k=+slot.dataset.k, v=ans()[k];
+      if(held&&held.from!==k) move(held.v,held.from,k);
+      else if(v) hold(v,k);
+      else say('Select an option first.');
+    }
+    else if(e.target.closest('.pool')&&held&&held.from!==null) move(held.v,held.from,'pool');
+  });
+  board.addEventListener('keydown',e=>{ if(e.key==='Escape'&&held){ held=null; paint(); say('selection cleared'); } });
+  // Dragging uses Pointer Events, so mouse, pen and touch behave the same.
+  board.addEventListener('pointerdown',e=>{
+    if(locked||e.button!==0||!e.isPrimary) return;
+    const piece=e.target.closest('.piece'), btn=e.target.closest('.slotbtn');
+    const from=btn?+btn.closest('.slot').dataset.k:null;
+    const v=btn?ans()[from]:(piece&&!piece.disabled?values[+piece.dataset.n]:'');
+    if(!v) return;
+    const src=piece||btn, box=src.getBoundingClientRect(), x0=e.clientX, y0=e.clientY, id=e.pointerId, width=Math.min(box.width,300);
+    let ghost=null, over=null;
+    const noSelect=ev=>ev.preventDefault();
+    const targetAt=ev=>{ const el=document.elementFromPoint(ev.clientX,ev.clientY); const t=el&&el.closest('.slot, .pool'); return t&&board.contains(t)?t:null; };
+    const mark=t=>{ if(over) over.classList.remove('over'); over=t; if(over) over.classList.add('over'); };
+    const drag=ev=>{
+      if(ev.pointerId!==id) return;
+      if(!ghost){
+        if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<6) return; // still a tap
+        held=null; paint();
+        ghost=document.createElement('div'); ghost.className='ghost-drag'; ghost.setAttribute('aria-hidden','true'); ghost.textContent=v;
+        ghost.style.width=width+'px'; document.body.append(ghost); src.classList.add('lifted');
+      }
+      ghost.style.left=(ev.clientX-Math.min(x0-box.left,width-24))+'px'; ghost.style.top=(ev.clientY-(y0-box.top))+'px';
+      mark(targetAt(ev));
+    };
+    const end=ev=>{
+      if(ev.pointerId!==id) return;
+      grabbing=false;
+      document.removeEventListener('selectstart',noSelect);
+      document.removeEventListener('pointermove',drag); document.removeEventListener('pointerup',end); document.removeEventListener('pointercancel',end);
+      if(!ghost) return; // a plain tap: the click handler takes it
+      ghost.remove(); src.classList.remove('lifted'); mark(null);
+      dragged=true; setTimeout(()=>{ dragged=false; },0); // ignore the click a mouse drag can end with
+      if(ev.type==='pointercancel') return;
+      const t=targetAt(ev);
+      move(v,from,!t?null:t.classList.contains('pool')?'pool':+t.dataset.k);
+    };
+    grabbing=true;
+    document.addEventListener('selectstart',noSelect); // a mouse drag must not highlight the page
+    document.addEventListener('pointermove',drag); document.addEventListener('pointerup',end); document.addEventListener('pointercancel',end);
+  });
+  // Claiming the touch keeps the page still and stops the browser swallowing the tap that follows a quick drag.
+  board.addEventListener('touchmove',e=>{ if(grabbing) e.preventDefault(); },{passive:false});
+  paint();
+  return {
+    ready:()=>ans().every(v=>v),
+    // After Check answer: freeze the board, mark each slot and show the right value for wrong ones.
+    lock(p){
+      locked=true; held=null; paint(); board.classList.add('locked');
+      slots.forEach((el,k)=>{
+        const want=q.slots[k].correct, good=p[k]===want;
+        el.classList.add(good?'right':'wrong'); el.querySelector('.slotmk').textContent=good?'✓':'✕';
+        el.querySelector('.slotbtn').setAttribute('aria-label',`${name(k)}: ${p[k]}, ${good?'correct':'incorrect. Correct answer: '+want}`);
+        if(!good) el.insertAdjacentHTML('beforeend',`<div class="fix">Correct answer: <b>${esc(want)}</b></div>`);
+      });
+    }
+  };
 }
 
 /* ---------- review screen ---------- */
