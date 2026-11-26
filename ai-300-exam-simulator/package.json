@@ -1,0 +1,11 @@
+{
+  "name": "ai-300-exam-simulator",
+  "private": true,
+  "description": "Single-page AI-300 practice app: question bank, synthetic questions, Yes/No series, case studies and an exam simulation.",
+  "scripts": {
+    "build": "python3 scripts/build.py",
+    "validate": "python3 scripts/validate.py",
+    "test": "python3 scripts/build.py && node tests/flow.test.js"
+  },
+  "devDependencies": { "playwright": "^1.48.0" }
+}
