@@ -3,8 +3,6 @@
 Single-page AI-300 practice app. No backend, no accounts, nothing is persisted (only the light/dark choice, in localStorage, wrapped in try/catch). Read README.md for the feature list and data format.
 
 ## Commands
-Paths and commands in this file are relative to `ai-300-exam-simulator/`.
-
 - On Windows the Python command is `python`, not `python3`. If `python` opens the Microsoft Store message, put `%LOCALAPPDATA%\Python\bin` ahead of `WindowsApps` on PATH. `npm test` and `npm run build` call `python3`, which that folder also provides.
 - `python3 scripts/build.py` builds `dist/index.html` (add `--root` to also write `./index.html`).
 - `python3 scripts/validate.py` checks `data/synthetic.json` (keys, duplicates, answer-position balance). Run it after any synthetic edit.
@@ -14,7 +12,7 @@ Paths and commands in this file are relative to `ai-300-exam-simulator/`.
 ## Where things live
 - `src/template.html` is the whole app: CSS, HTML shell and JS in one file. Placeholders `__DATA__` and `__SYN__` are replaced by the build. Never put real data in the template.
 - `data/questions.json` is the original question bank. `data/synthetic.json` is `{normal[], series[], cases[]}`.
-- `index.html` in the project folder is a build output. Edit the template, then rebuild.
+- `index.html` at the repo root is a build output. Edit the template, then rebuild.
 
 ## Do not
 - Do not read `data/*.json` in full (about 200 KB together). Search with grep or read small slices when you need a question.
