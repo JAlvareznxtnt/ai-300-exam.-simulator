@@ -539,13 +539,26 @@ function record(q,picked,ok){
 function fmtTime(ms){ const s=Math.floor(ms/1000); return Math.floor(s/60)+' min '+String(s%60).padStart(2,'0')+' s'; }
 function finish(){
   if(S.timer){clearInterval(S.timer);S.timer=null;}
-  const r=S.res; const n=r.length; const right=r.filter(x=>x.ok).length;
-  if(n===0){ showSetup(S.cfg); return; }
-  const pct=Math.round(right/n*100);
-  const by={}; r.forEach(x=>{const d=x.q.dom; by[d]=by[d]||{n:0,r:0}; by[d].n++; if(x.ok) by[d].r++;});
-  const missed=r.filter(x=>!x.ok);
-  const notDone=S.cfg.mode==='exam'?0:S.qs.length-n;
-  const syn=r.filter(x=>x.q.syn), org=r.filter(x=>!x.q.syn);
+  const r=S.res; const exam=S.cfg.mode==='exam';
+  if(r.length===0){ showSetup(S.cfg); return; }
+  // Scores cover answered questions only. Practice results only ever hold answered ones.
+  const done=exam?r.filter(x=>x.answered):r;
+  const skipped=exam?r.filter(x=>!x.answered):[];
+  const correct=done.filter(x=>x.ok), missed=done.filter(x=>!x.ok);
+  const n=done.length; const right=correct.length;
+  const pct=n?Math.round(right/n*100):0;
+  const full=Math.round(right/r.length*100);
+  const by={}; done.forEach(x=>{const d=x.q.dom; by[d]=by[d]||{n:0,r:0}; by[d].n++; if(x.ok) by[d].r++;});
+  const notDone=exam?0:S.qs.length-n;
+  const syn=done.filter(x=>x.q.syn), org=done.filter(x=>!x.q.syn);
+  const group=(title,items,status,open)=>`<h2 class="section-title">${title}</h2>${items.map((x,k)=>reviewItem(x,status,open(k))).join('')||'<p class="small">None.</p>'}`;
+  const shut=()=>false;
+  const review=exam
+    ? group(`Answered incorrectly (${missed.length})`,missed,'incorrect',k=>k===0)
+      +group(`Not answered (${skipped.length})`,skipped,'unanswered',shut)
+      +group(`Answered correctly (${right})`,correct,'correct',shut)
+    : `<h2 class="section-title">${missed.length?'Missed questions':'No missed questions'}</h2>${missed.map((x,k)=>reviewItem(x,'missed',k===0)).join('')}`
+      +group('Answered correctly',correct,'correct',shut);
   const split=(syn.length&&org.length)?`<p class="small">Original: ${org.filter(x=>x.ok).length}/${org.length} · <span class="tag syn-badge">Synthetic</span> ${syn.filter(x=>x.ok).length}/${syn.length}</p>`:'';
   const C=2*Math.PI*62;
   app.innerHTML=`
@@ -553,26 +566,24 @@ function finish(){
     <h1>Results</h1>
     <div class="panel-card card" style="margin-top:18px">
       <div class="res-top">
-        <div class="ring" role="img" aria-label="${pct} percent correct"><svg width="150" height="150" viewBox="0 0 150 150"><circle class="trk" cx="75" cy="75" r="62" fill="none" stroke-width="12"/><circle class="val" id="ringv" cx="75" cy="75" r="62" fill="none" stroke-width="12" stroke-dasharray="${C}" stroke-dashoffset="${REDUCE?C*(1-pct/100):C}"/></svg><div class="num" id="ringn">${REDUCE?pct:0}%</div></div>
+        <div class="ring" role="img" aria-label="${n?pct+' percent correct':'No questions answered'}"><svg width="150" height="150" viewBox="0 0 150 150"><circle class="trk" cx="75" cy="75" r="62" fill="none" stroke-width="12"/><circle class="val" id="ringv" cx="75" cy="75" r="62" fill="none" stroke-width="12" stroke-dasharray="${C}" stroke-dashoffset="${REDUCE?C*(1-pct/100):C}" ${n?'':'visibility="hidden"'}/></svg><div class="num" id="ringn">${n?(REDUCE?pct:0)+'%':'–'}</div></div>
         <div>
-          <p class="big score">${right} / ${n} <span class="small">(${pct}%)</span></p>
-          ${S.cfg.sim?`<p class="small">Time: ${fmtTime(Date.now()-S.t0)}. The real exam is scored out of 1000 with 700 to pass, so treat this percentage as a rough guide only.</p>`:''}
+          <p class="big score">${right} / ${n} <span class="small">${exam?(n?`answered correctly (${pct}%)`:'(no questions answered)'):`(${pct}%)`}</span></p>
+          ${S.cfg.sim?`<p class="small"><b>Full-exam estimate:</b> ${right} / ${r.length} (${full}%), with unanswered questions counted as wrong.</p>
+          <p class="small">Time: ${fmtTime(Date.now()-S.t0)}. The real exam is scored out of 1000 with 700 to pass, so treat these percentages as a rough guide only.</p>`:''}
           ${split}
-          ${S.unans>0?`<p class="small">${S.unans} question${S.unans>1?'s were':' was'} left unanswered and counted as wrong.</p>`:''}
+          ${skipped.length?`<p class="small">${skipped.length} question${skipped.length>1?'s were':' was'} not answered and ${skipped.length>1?'are':'is'} not in the score above.</p>`:''}
           ${notDone>0?`<p class="small">${notDone} question${notDone>1?'s were':' was'} not reached and not counted.</p>`:''}
         </div>
       </div>
       <h2 class="section-title">By domain</h2>
-      ${Object.keys(by).sort().map(d=>{const v=by[d],p=Math.round(v.r/v.n*100); return `<div class="dom"><span class="nm">${DOMAINS[d]}</span><span class="vl">${v.r}/${v.n} (${p}%)</span><div class="bar"><i class="${p<60?'low':''}" data-w="${p}" style="width:${REDUCE?p:0}%"></i></div></div>`;}).join('')}
+      ${Object.keys(by).sort().map(d=>{const v=by[d],p=Math.round(v.r/v.n*100); return `<div class="dom"><span class="nm">${DOMAINS[d]}</span><span class="vl">${exam?`${v.n} answered · ${v.r} correct (${p}%)`:`${v.r}/${v.n} (${p}%)`}</span><div class="bar"><i class="${p<60?'low':''}" data-w="${p}" style="width:${REDUCE?p:0}%"></i></div></div>`;}).join('')||'<p class="small">No questions answered.</p>'}
     </div>
     <div class="row" style="margin:18px 0 6px">
-      <button class="primary" id="retry" ${missed.length?'':'disabled'}>Retry the ${missed.length} missed</button>
+      <button class="primary" id="retry" ${missed.length?'':'disabled'}>Retry the ${missed.length} ${exam?'incorrect':'missed'}</button>
       <button id="again">Back to setup</button>
     </div>
-    <h2 class="section-title">${missed.length?'Missed questions':'No missed questions'}</h2>
-    ${missed.map((x,k)=>reviewItem(x,k)).join('')}
-    <h2 class="section-title">Answered correctly</h2>
-    ${r.filter(x=>x.ok).map((x,k)=>reviewItem(x,k,true)).join('')||'<p class="small">None.</p>'}
+    ${review}
     </div>`;
   document.getElementById('again').onclick=()=>showSetup(S.cfg);
   document.getElementById('retry').onclick=()=>{ const qs=shuffle(missed.map(x=>x.q)); startSession(qs,Object.assign({},S.cfg,{n:qs.length,sim:false,mode:S.cfg.sim?'practice':S.cfg.mode})); };
@@ -583,13 +594,14 @@ function finish(){
       app.querySelectorAll('.dom .bar i').forEach(b=>b.style.width=b.dataset.w+'%');
       const el=document.getElementById('ringn'); const t0=performance.now();
       const step=t=>{ const k=Math.min(1,(t-t0)/900); el.textContent=Math.round(pct*(1-Math.pow(1-k,3)))+'%'; if(k<1) requestAnimationFrame(step); };
-      requestAnimationFrame(step);
+      if(n) requestAnimationFrame(step);
     }));
   }
 }
-function reviewItem(x,k,good){
+function reviewItem(x,status,open){
   const first=esc(x.q.stem.replace(/\*\*/g,'').split('\n')[0].slice(0,110))+(x.q.stem.length>110?'…':'');
-  return `<details class="rev" ${(!good&&k===0)?'open':''}><summary>${good?'<span class="pill-good">Correct</span>':'<span class="pill-bad">Missed</span>'}${x.q.syn?'<span class="tag syn-badge">Synthetic</span>':''}<span class="chip">${DOMAINS[x.q.dom]}</span><span class="sumtxt">${first}</span></summary><div class="in">${reviewBody(x)}</div></details>`;
+  const pill={correct:'<span class="pill-good">Correct</span>',missed:'<span class="pill-bad">Missed</span>',incorrect:'<span class="pill-bad">Incorrect</span>',unanswered:'<span class="chip">Not answered</span>'}[status];
+  return `<details class="rev" data-status="${status}" ${open?'open':''}><summary>${pill}${x.q.syn?'<span class="tag syn-badge">Synthetic</span>':''}<span class="chip">${DOMAINS[x.q.dom]}</span><span class="sumtxt">${first}</span></summary><div class="in">${reviewBody(x)}</div></details>`;
 }
 function reviewBody(x){
   const q=x.q; let h='';
