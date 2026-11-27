@@ -29,7 +29,13 @@
    "rationale": "A managed identity authenticates without a stored secret, and Storage Blob Data Reader gives the read access the jobs need. An account key and a SAS token are both secrets, even when kept in Key Vault or a datastore. A public container removes authentication altogether.",
    "hint": "No secrets + Azure resource = managed identity + a data role.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Set up authentication between Azure Machine Learning and other services",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-identity-based-service-authentication?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3002,
@@ -60,7 +66,17 @@
    "rationale": "Credential-less (identity-based) datastores rely on Microsoft Entra identities and Azure RBAC, so nothing secret is saved. Account keys, SAS tokens and service principal secrets are all stored credentials.",
    "hint": "Credential-less datastore = identity-based access, no stored secret.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Set up authentication between Azure Machine Learning and other services",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-identity-based-service-authentication?view=azureml-api-2"
+    },
+    {
+     "title": "Create datastores",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-datastore?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3003,
@@ -91,7 +107,17 @@
    "rationale": "An mltable asset stores the loading logic (source files, column selection, other transformations) next to the data, so consumers call one load function and get a table. A uri_folder or uri_file only gives a path, and every consumer has to write the parsing code. A model asset is for models.",
    "hint": "Table with schema and transformations = mltable. Just a path = uri_file or uri_folder.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "CLI (v2) MLtable YAML schema",
+     "url": "https://learn.microsoft.com/azure/machine-learning/reference-yaml-mltable?view=azureml-api-2"
+    },
+    {
+     "title": "Working with tables in Azure Machine Learning",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-mltable?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3004,
@@ -122,7 +148,17 @@
    "rationale": "Pinned package versions in a registered, versioned environment mean every job builds the same image. Installing at job start or by hand pulls whatever is newest at that moment, and referring to the newest environment version removes the control you wanted.",
    "hint": "Reproducible = pinned packages + a registered environment version.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "What are Azure Machine Learning environments?",
+     "url": "https://learn.microsoft.com/azure/machine-learning/concept-environments?view=azureml-api-2"
+    },
+    {
+     "title": "Troubleshooting environment issues",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-troubleshoot-environments?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3005,
@@ -153,7 +189,13 @@
    "rationale": "A registry is built to share assets such as components, environments and models across workspaces, and it keeps versions. Copies drift apart, and Contributor on workspace A gives far more access than reuse needs.",
    "hint": "Share assets across workspaces = registry.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Machine learning registries for MLOps",
+     "url": "https://learn.microsoft.com/azure/machine-learning/concept-machine-learning-registries-mlops?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3006,
@@ -189,7 +231,13 @@
    "rationale": "Disabling public network access closes the public endpoint, and a private endpoint gives users inside the virtual network a private path to the workspace. An IP allowlist keeps the public endpoint reachable. A public IP on compute and Defender for Cloud do not restrict workspace access.",
    "hint": "No public access = disable public network access + private endpoint.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Configure a private endpoint for an Azure Machine Learning workspace",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-configure-private-link?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3007,
@@ -220,7 +268,17 @@
    "rationale": "what-if previews the changes a deployment would make and applies nothing. create deploys for real, and with Complete mode it can delete resources. bicep build only compiles to an ARM template. validate checks that the template can deploy, but it does not list the changes.",
    "hint": "Preview changes without deploying = what-if.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Bicep What-If: Preview Changes Before Deployment",
+     "url": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/deploy-what-if"
+    },
+    {
+     "title": "Azure Resource Manager deployment modes",
+     "url": "https://learn.microsoft.com/azure/azure-resource-manager/templates/deployment-modes"
+    }
+   ]
   },
   {
    "n": 3008,
@@ -251,7 +309,13 @@
    "rationale": "The existing keyword tells Bicep to look up a resource that is already deployed instead of creating it. The role assignment then uses that account as its scope, so the assignment applies to that account only.",
    "hint": "`existing` = reference, don't create.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Reference existing resources in Bicep",
+     "url": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/existing-resource"
+    }
+   ]
   },
   {
    "n": 3009,
@@ -282,7 +346,13 @@
    "rationale": "git revert adds a new commit that undoes the change, so shared history stays intact for everyone who pulled. reset, rebase and amend rewrite history, and force-pushing a rewritten main branch breaks teammates' copies.",
    "hint": "Undo on a shared branch = revert. Rewriting history = reset, rebase, amend.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Undo changes",
+     "url": "https://learn.microsoft.com/azure/devops/repos/git/undo?view=azure-devops"
+    }
+   ]
   },
   {
    "n": 3010,
@@ -313,7 +383,13 @@
    "rationale": "AzureML Data Scientist allows nearly all workspace actions except creating or deleting compute and changing the workspace itself. Owner and Contributor allow those actions too, and Reader is read-only, so jobs could not be submitted.",
    "hint": "Run jobs but not manage compute = AzureML Data Scientist.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Manage access to Azure Machine Learning workspaces",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-assign-roles?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3011,
@@ -884,7 +960,25 @@
    "rationale": "You size first, then confirm the capacity exists, then deploy, and finally reserve the PTUs you actually run to get the discount. Reserving before you know the size or the capacity risks paying for PTUs you cannot use.",
    "hint": "Estimate, verify capacity, deploy, reserve.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. The order follows the documented provisioned throughput workflow.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "What is provisioned throughput for Foundry Models?",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/concepts/provisioned-throughput"
+    },
+    {
+     "title": "Provisioned throughput billing and cost management",
+     "url": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/provisioned-throughput-onboarding"
+    },
+    {
+     "title": "Quickstart: Create a provisioned throughput deployment",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/provisioned-quickstart"
+    },
+    {
+     "title": "Deployment types for Microsoft Foundry Models",
+     "url": "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types"
+    }
+   ]
   },
   {
    "n": 3028,
@@ -2089,7 +2183,13 @@
      "hint": "No secrets + Azure resource access = managed identity + least-privilege role.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 2,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Access Azure resources from an online endpoint with a managed identity",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-access-resources-from-endpoints-managed-identities?view=azureml-api-2"
+      }
+     ]
     },
     {
      "n": 2004,
@@ -2197,11 +2297,25 @@
        ]
       }
      ],
-     "rationale": "Data must exist as an asset before training reads it. The sweep trains candidates and logs metrics, and only then can you pick and register the best model. The registered model is what the green deployment uses, and mirrored traffic validates it before any customer sees it. Shifting traffic and removing blue comes last.",
+     "rationale": "In this case study training reads the data as an mltable data asset, so that asset is registered first. The sweep trains candidates and logs metrics, and only then can you pick and register the best model. The registered model is what the green deployment uses, and mirrored traffic validates it before any customer sees it. Shifting traffic and removing blue comes last.",
      "hint": "Data, train, register, test with mirror, shift.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning. The order is our reasoning for this scenario.",
      "caseId": 2,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Perform safe rollout of new deployments for real-time inference",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-safely-rollout-online-endpoints?view=azureml-api-2"
+      },
+      {
+       "title": "Data concepts in Azure Machine Learning",
+       "url": "https://learn.microsoft.com/azure/machine-learning/concept-data?view=azureml-api-2"
+      },
+      {
+       "title": "Hyperparameter tuning a model (v2)",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2"
+      }
+     ]
     }
    ]
   },
@@ -2214,7 +2328,7 @@
      "n": 3057,
      "dom": 1,
      "type": "mc",
-     "stem": "You need to create the federated credential on the Microsoft Entra app. It must issue tokens only to workflows that run in the `prod` environment of `adventureworks/loan-infra`.\n\nWhich subject should you use?",
+     "stem": "You need to create the federated credential on the Microsoft Entra app. It must issue tokens only to workflows that run in the `prod` environment of `adventureworks/loan-infra`. The repository uses GitHub's name-based subject format.\n\nWhich subject should you use?",
      "opts": [
       [
        "A",
@@ -2236,11 +2350,21 @@
      "correct": [
       "C"
      ],
-     "rationale": "The environment subject has the form repo:<org>/<repo>:environment:<name>, so it must name the prod environment exactly. A branch subject matches any workflow on main whether or not it runs in the protected environment, a pull request subject matches pull request runs, and environment:production is a different name from prod.",
+     "rationale": "The environment subject has the form repo:<org>/<repo>:environment:<name>, so it must name the prod environment exactly. This is the name-based format; repositories created, renamed or transferred from July 15, 2026 use a format that adds the owner and repository IDs, and older ones keep this format until they opt in. A branch subject matches any workflow on main whether or not it runs in the protected environment, a pull request subject matches pull request runs, and environment:production is a different name from prod.",
      "hint": "OIDC subject for an environment = repo:org/repo:environment:name.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "caseId": 3
+     "caseId": 3,
+     "sources": [
+      {
+       "title": "Configure an app to trust an external identity provider",
+       "url": "https://learn.microsoft.com/entra/workload-id/workload-identity-federation-create-trust"
+      },
+      {
+       "title": "Migrate GitHub Actions federated credentials to immutable subjects",
+       "url": "https://learn.microsoft.com/entra/workload-id/workload-identities-github-immutable-subjects"
+      }
+     ]
     },
     {
      "n": 3058,
