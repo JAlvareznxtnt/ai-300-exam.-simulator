@@ -1,5 +1,31 @@
 # Question verification
 
+**Resume from:** domain 5 (nothing in the list below is checked yet).
+
+## Worth verifying
+
+Checked in this order. All remaining synthetic questions are included.
+
+| Domain | Synthetic | Bank (why) |
+|---|---|---|
+| Domain 5: Optimize GenAI | 3043, 3044, 3045, 3046, 3047, 3048, 3049, 3050 | 16 (fine-tune form fields), 19 (GPU requirement for fine-tuning) |
+| Domain 2: ML model lifecycle | 3011, 3012, 3013, 3014, 3015, 3016, 3017, 3018, 3019, 3020, 3021, 3022, 3023, 3024, 3054, 3055, 3056, 2001, 2002, 2004 | 62 (SDK parameter name), 77 (endpoint type (our own grading)), 78 (MLflow API call (our own grading)), 82 (scoring script functions (our own grading)), 84 (deployment setting name (our own grading)) |
+| Domain 3: GenAIOps infrastructure | 3025, 3026, 3028, 3029, 3030, 3031, 3032, 3033, 3034, 3035, 3051, 3052, 3053, 1001, 1002, 3058, 3059, 3060, 3061 | 21 (benchmark metric names), 22 (role names), 24 (deployment type behaviour), 25 (provisioned throughput facts), 67 (model version upgrade setting) |
+| Domain 4: GenAI QA and observability | 3036, 3037, 3038, 3039, 3040, 3041, 3042, 1003, 1004, 1005 | 72 (evaluator names), 73 (YAML property), 74 (tool capabilities and cost tags), 75 (metric definition), 76 (evaluator input names), 79 (metric names (our own grading)), 80 (content safety feature names (our own grading)) |
+
+## Skipped (reason)
+
+| Reason | Questions |
+|---|---|
+| Workflow or process reasoning, no specific documented name, limit or default | 17, 31, 69 |
+| Scenario reasoning: what to do with data, prompts or rollout | 18, 23, 28, 32, 33, 68, 70, 83 |
+| General concept or definition, no checkable parameter | 27, 40, 66 |
+| Architecture or catalog judgment, no checkable parameter | 29, 34 |
+| Decided earlier: docs don't confirm | 56, 59, 81 |
+| Already checked (priority questions, domain 1, domain 2 part 1) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 57, 58, 60, 61, 63, 64, 65, 2003, 2005, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010, 3027, 3057 |
+
+## How to read this file
+
 Each question is checked against Microsoft Learn. `sources` in the data lists the same pages.
 
 - **Verified yes**: the cited pages support the keyed answer, after any change listed.
