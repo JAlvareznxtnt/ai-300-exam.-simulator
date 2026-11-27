@@ -1489,10 +1489,16 @@
    "correct": [
     "D"
    ],
-   "rationale": "Overlap repeats text at the end of one chunk at the start of the next, so a sentence at a boundary appears whole in at least one chunk. Smaller chunks without overlap make boundary splits worse, and temperature or search mode do not address where text is cut.",
+   "rationale": "Overlap repeats a small amount of text from one chunk in the next, which helps keep continuity and context across the boundary.",
    "hint": "Facts cut at chunk boundaries = add overlap.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Chunk large documents for RAG and vector search in Foundry IQ (Azure AI Search)",
+     "url": "https://learn.microsoft.com/azure/search/vector-search-how-to-chunk-documents"
+    }
+   ]
   },
   {
    "n": 3044,
@@ -1523,7 +1529,13 @@
    "rationale": "Keyword and vector scores are on different scales, so Azure AI Search merges the ranked lists with Reciprocal Rank Fusion, which uses rank positions rather than raw scores.",
    "hint": "Hybrid search merges ranked lists with RRF.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Relevance scoring in hybrid search using Reciprocal Rank Fusion (RRF)",
+     "url": "https://learn.microsoft.com/azure/search/hybrid-search-ranking"
+    }
+   ]
   },
   {
    "n": 3045,
@@ -1551,10 +1563,16 @@
    "correct": [
     "C"
    ],
-   "rationale": "Filtering by a similarity or reranker threshold and sending fewer chunks removes noise before it reaches the model. More chunks add more noise and cost, and few-shot examples or longer answers do not fix retrieval precision.",
+   "rationale": "Filtering by a similarity or reranker threshold and sending fewer chunks removes noise before it reaches the model. More chunks add more noise and cost.",
    "hint": "Too much noise in context = stricter threshold, smaller top-k.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Information retrieval",
+     "url": "https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-information-retrieval"
+    }
+   ]
   },
   {
    "n": 3046,
@@ -1582,10 +1600,16 @@
    "correct": [
     "D"
    ],
-   "rationale": "The weakness is in how text is turned into vectors, so the fix is a better embedding model, and the documents and queries must be embedded with the same new model. The other choices act on generation or only add noise.",
+   "rationale": "The weakness is in how text is turned into vectors, so the fix is a better embedding model, and the documents and queries must be embedded with the same new model.",
    "hint": "Retrieval misses domain terms = domain embedding model, and re-embed everything.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "RAG generate embeddings phase",
+     "url": "https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-generate-embeddings"
+    }
+   ]
   },
   {
    "n": 3047,
@@ -1626,10 +1650,16 @@
      ]
     }
    ],
-   "rationale": "RAG brings in current or private knowledge at query time. Supervised fine-tuning teaches style, tone and format from examples and can shorten prompts. Prompt engineering is the first and cheapest step for small behavior changes. Fine-tuning does not keep facts up to date.",
+   "rationale": "RAG brings in current or private knowledge at query time. Supervised fine-tuning teaches style, tone and format from examples and can shorten prompts. Fine-tuning needs task-specific training data, so a quick change with no data is made in the prompt. Fine-tuning does not keep facts up to date.",
    "hint": "Facts that change = RAG. Style and format at scale = fine-tuning. Quick tweak = prompt.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Training in Microsoft Foundry",
+     "url": "https://learn.microsoft.com/azure/ai-foundry/openai/concepts/fine-tuning-considerations"
+    }
+   ]
   },
   {
    "n": 3048,
@@ -1662,10 +1692,16 @@
     "B",
     "D"
    ],
-   "rationale": "Falling training loss with rising validation loss is a sign of overfitting. Fewer epochs and a smaller learning rate multiplier both reduce how strongly the model fits the training data. More epochs or a larger multiplier make it worse, and removing the validation file only hides the signal.",
+   "rationale": "Falling training loss with rising validation loss is a sign of overfitting. Fewer epochs and a smaller learning rate multiplier both reduce how strongly the model fits the training data. More epochs or a larger multiplier make it worse.",
    "hint": "Overfitting = fewer epochs, lower learning rate multiplier.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Fine-tune a model with supervised fine-tuning in Microsoft Foundry",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/how-to/fine-tuning"
+    }
+   ]
   },
   {
    "n": 3049,
@@ -1693,10 +1729,16 @@
    "correct": [
     "C"
    ],
-   "rationale": "Validation loss is lowest at epoch 2 and then rises, so later checkpoints overfit. The latest checkpoint is not automatically the best, so compare candidates and confirm on held-out examples. Averaging checkpoints is not a supported workflow here.",
+   "rationale": "Validation loss is lowest at epoch 2 and then rises, so later checkpoints overfit. The latest checkpoint is not automatically the best, so compare candidates and confirm on held-out examples.",
    "hint": "Pick the checkpoint with the best validation result, not the latest.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Fine-tune a model with supervised fine-tuning in Microsoft Foundry",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/how-to/fine-tuning"
+    }
+   ]
   },
   {
    "n": 3050,
@@ -1724,10 +1766,20 @@
    "correct": [
     "D"
    ],
-   "rationale": "Synthetic data can contain errors, so it is reviewed and filtered. Validation and test examples must stay out of the training set, otherwise the validation metrics cannot reveal overfitting.",
+   "rationale": "Synthetic data can contain errors, so it is reviewed and filtered. Training and validation examples are kept in separate files.",
    "hint": "Synthetic data still needs review, and validation stays separate.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Generate synthetic data for fine-tuning in Microsoft Foundry (preview)",
+     "url": "https://learn.microsoft.com/azure/foundry/fine-tuning/data-generation"
+    },
+    {
+     "title": "Fine-tune a model with supervised fine-tuning in Microsoft Foundry",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/how-to/fine-tuning"
+    }
+   ]
   }
  ],
  "series": [

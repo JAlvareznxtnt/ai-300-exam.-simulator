@@ -1,6 +1,6 @@
 # Question verification
 
-**Resume from:** domain 5 (nothing in the list below is checked yet).
+**Resume from:** domain 2 (domain 5 is done).
 
 ## Worth verifying
 
@@ -126,3 +126,20 @@ Wrong-option explanations were checked only where they state a specific technica
 | 59 | [Model performance and fairness](https://learn.microsoft.com/azure/machine-learning/concept-fairness-ml?view=azureml-api-2) | no (docs don't confirm) | Selection rate does not show fairness: contradicted. Influencer and Application Insights remarks: not checked. | Rationale fixed and note added. The page lists recall disparity and selection rate disparity as fairness measures and does not prefer one. |
 | 60 | [Batch endpoints](https://learn.microsoft.com/azure/machine-learning/concept-endpoints-batch?view=azureml-api-2)<br>[Online endpoint deployment for real-time inferencing](https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online?view=azureml-api-2) | yes | AKS underlies online endpoints: contradicted as a general statement (managed online endpoints do not need a cluster of yours). Conda remark: not checked. | Rationale fixed. |
 | 61 | [Online endpoint deployment for real-time inferencing](https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online?view=azureml-api-2)<br>[Batch endpoints](https://learn.microsoft.com/azure/machine-learning/concept-endpoints-batch?view=azureml-api-2) | yes | Batch is asynchronous; pipeline component deployments are for batch pipelines; Kubernetes endpoints need infrastructure you manage: supported. | No change. |
+
+## Domain 5: Optimize GenAI
+
+10 questions: 10 verified, 0 not confirmed.
+
+| Question | Source | Verified | Wrong-option claims | What changed |
+|---|---|---|---|---|
+| 3043 | [Chunk large documents for RAG and vector search in Foundry IQ (Azure AI Search)](https://learn.microsoft.com/azure/search/vector-search-how-to-chunk-documents) | yes | Deleted: smaller chunks, temperature and search mode. | Rationale rewritten to the documented effect of overlap. |
+| 3044 | [Relevance scoring in hybrid search using Reciprocal Rank Fusion (RRF)](https://learn.microsoft.com/azure/search/hybrid-search-ranking) | yes | Scores differ in range and magnitude, and RRF ranks by position: supported. | No change. |
+| 3045 | [Information retrieval](https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-information-retrieval) | yes | More chunks add noise and cost: supported. Deleted: few-shot examples and longer answers do not help. | Unsupported claim deleted. |
+| 3046 | [RAG generate embeddings phase](https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-generate-embeddings) | yes | Deleted: the other choices act on generation or only add noise. | Unsupported claim deleted. |
+| 3047 | [Training in Microsoft Foundry](https://learn.microsoft.com/azure/ai-foundry/openai/concepts/fine-tuning-considerations) | yes | Rewritten: "prompt engineering is the first and cheapest step". Fine-tuning does not replace retrieval for current information: supported. | One rationale sentence rewritten. |
+| 3048 | [Fine-tune a model with supervised fine-tuning in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/openai/how-to/fine-tuning) | yes | More epochs raise overfitting and a smaller multiplier lowers it: supported. Deleted: removing the validation file. | Unsupported claim deleted. |
+| 3049 | [Fine-tune a model with supervised fine-tuning in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/openai/how-to/fine-tuning) | yes | The latest checkpoint is not automatically best: supported. Deleted: averaging checkpoints is unsupported. | Unsupported claim deleted. |
+| 3050 | [Generate synthetic data for fine-tuning in Microsoft Foundry (preview)](https://learn.microsoft.com/azure/foundry/fine-tuning/data-generation)<br>[Fine-tune a model with supervised fine-tuning in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/openai/how-to/fine-tuning) | yes | Rewritten: "otherwise validation metrics cannot reveal overfitting". | One rationale sentence rewritten. |
+| 16 | [How to use Open Source foundation models curated by Azure Machine Learning](https://learn.microsoft.com/azure/machine-learning/how-to-use-foundation-models?view=azureml-api-2) | yes | Register applies to the fine-tuned output: supported. | No change. The page lists providing the data and then mapping its columns. |
+| 19 | [How to use Open Source foundation models curated by Azure Machine Learning](https://learn.microsoft.com/azure/machine-learning/how-to-use-foundation-models?view=azureml-api-2) | yes | Rewritten: dataset registration is not required. Deleted: scoring script and pipeline claims. | Rationale trimmed to the documented steps. |
