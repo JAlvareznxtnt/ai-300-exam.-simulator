@@ -1429,7 +1429,17 @@
    "rationale": "In the SDK's evaluate() the mapping uses the ${data.column} syntax, and each evaluator input must point at the right column: the answer is the response and the retrieved documents are the context. The {{item.column}} syntax belongs to cloud evaluations, and the other mappings feed the wrong columns.",
    "hint": "Local evaluate() = ${data.col}. Cloud evaluation = {{item.col}}.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "evaluation Package",
+     "url": "https://learn.microsoft.com/python/api/azure-ai-evaluation/azure.ai.evaluation?view=azure-python"
+    },
+    {
+     "title": "Risk and safety evaluators",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/risk-safety-evaluators"
+    }
+   ]
   },
   {
    "n": 3037,
@@ -1460,7 +1470,13 @@
    "rationale": "Risk and safety evaluators run on the Foundry safety evaluation service, so you give them the Foundry project (azure_ai_project) and a credential instead of a GPT model_config. They do not need ground truth.",
    "hint": "Quality evaluators = model_config. Safety evaluators = azure_ai_project.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "HateUnfairnessEvaluator Class",
+     "url": "https://learn.microsoft.com/python/api/azure-ai-evaluation/azure.ai.evaluation.hateunfairnessevaluator?view=azure-python"
+    }
+   ]
   },
   {
    "n": 3038,
@@ -1501,10 +1517,16 @@
      ]
     }
    ],
-   "rationale": "ToolCallAccuracy looks at tool selection and parameters, IntentResolution at whether the user's intent was understood and addressed, and TaskAdherence at whether the response sticks to the assigned task. Groundedness compares an answer with source context, which is not about agent behavior.",
+   "rationale": "ToolCallAccuracy looks at tool selection and parameters, IntentResolution at whether the user's intent was understood and addressed, and TaskAdherence at whether the response sticks to the assigned task. Groundedness compares an answer with source context.",
    "hint": "Tool calls = ToolCallAccuracy. User goal = IntentResolution. Follows instructions = TaskAdherence.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Built-in evaluators reference",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/built-in-evaluators"
+    }
+   ]
   },
   {
    "n": 3039,
@@ -1532,10 +1554,24 @@
    "correct": [
     "A"
    ],
-   "rationale": "A length rule is a plain computation, so a code-based evaluator gives the same answer every time at no model cost, and it can be passed to evaluate() with the built-in ones. An LLM judge is slower, costs tokens and can miscount, and Fluency and Coherence do not measure length.",
+   "rationale": "A length rule is a plain computation, so a code-based evaluator, which runs your own Python scoring logic, fits it, and evaluate() accepts custom callables alongside the built-in evaluators. Fluency and Coherence measure writing quality rather than length.",
    "hint": "Rule you can compute = code-based custom evaluator. Judgment call = prompt-based.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Custom evaluators (preview)",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/custom-evaluators"
+    },
+    {
+     "title": "evaluation Package",
+     "url": "https://learn.microsoft.com/python/api/azure-ai-evaluation/azure.ai.evaluation?view=azure-python"
+    },
+    {
+     "title": "General purpose evaluators",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/general-purpose-evaluators"
+    }
+   ]
   },
   {
    "n": 3040,
@@ -1563,10 +1599,20 @@
    "correct": [
     "C"
    ],
-   "rationale": "Retrieval is high, so the right chunks are found. Groundedness is high, so the answers match those chunks, and fluency is high. Only Relevance fails, which means the answers do not address the question, so the problem is in the generation step. Chunking, embeddings and content filters would not fix it.",
+   "rationale": "Retrieval is high, so the right chunks are found. Groundedness is high, so the answers match those chunks, and fluency is high. Only Relevance fails, which means the answers do not address the question, so the problem is in the generation step.",
    "hint": "Read the scores as a chain: retrieval, then grounding, then relevance.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Retrieval-Augmented Generation (RAG) evaluators",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/rag-evaluators"
+    },
+    {
+     "title": "General purpose evaluators",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/general-purpose-evaluators"
+    }
+   ]
   },
   {
    "n": 3041,
@@ -1602,7 +1648,21 @@
    "rationale": "F1 score compares the response with a ground-truth answer. Document Retrieval compares the retrieved documents with labeled relevant documents. Groundedness, Fluency and Relevance judge the response without labels.",
    "hint": "Needs labels = F1 and Document Retrieval.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Retrieval-Augmented Generation (RAG) evaluators",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/rag-evaluators"
+    },
+    {
+     "title": "Textual similarity evaluators",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/textual-similarity-evaluators"
+    },
+    {
+     "title": "Built-in evaluators reference",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/built-in-evaluators"
+    }
+   ]
   },
   {
    "n": 3042,
@@ -1633,7 +1693,17 @@
    "rationale": "Time to Last Byte measures the total time until the last token is returned, which is the right overall latency for non-streaming calls. Time to Response measures how soon the first response appears and is recommended for streaming. The other two are token and capacity metrics, not latency.",
    "hint": "Non-streaming latency = Time to Last Byte. Streaming first token = Time to Response.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Performance and latency",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/how-to/latency"
+    },
+    {
+     "title": "Azure OpenAI monitoring data reference",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/monitor-openai-reference"
+    }
+   ]
   },
   {
    "n": 3043,
@@ -2277,7 +2347,21 @@
      "hint": "Attack hidden in a document = indirect attack detection + delimiters. Attack typed by the user = user prompt attack detection.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 1,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Prompt Shields in Microsoft Foundry",
+       "url": "https://learn.microsoft.com/azure/ai-foundry/openai/concepts/content-filter-prompt-shields"
+      },
+      {
+       "title": "Document embedding in prompts (classic)",
+       "url": "https://learn.microsoft.com/azure/ai-foundry/openai/concepts/content-filter-document-embedding"
+      },
+      {
+       "title": "Configure content filters (classic)",
+       "url": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/content-filters"
+      }
+     ]
     },
     {
      "n": 1004,
@@ -2316,7 +2400,13 @@
      "hint": "Labels for documents = Document Retrieval. Answer vs retrieved chunks = Groundedness.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 1,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Retrieval-Augmented Generation (RAG) evaluators",
+       "url": "https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/rag-evaluators"
+      }
+     ]
     },
     {
      "n": 1005,
@@ -2357,11 +2447,25 @@
        ]
       }
      ],
-     "rationale": "Application Insights holds traces and failures. Token counts such as Processed Prompt Tokens are Azure Monitor metrics, and you can split them by ModelDeploymentName. Money, grouped by tag, is in Cost Analysis. The activity log records control-plane operations such as who changed a resource.",
+     "rationale": "Application Insights holds traces and failures. Token counts such as Processed Prompt Tokens are Azure Monitor metrics, and you can split them by ModelDeploymentName. Money, grouped by tag, is in Cost Analysis.",
      "hint": "Traces and failures = App Insights. Token counts = Azure Monitor metrics. Money by tag = Cost Analysis.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 1,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Manage agents at scale in Microsoft Foundry Control Plane",
+       "url": "https://learn.microsoft.com/azure/foundry/control-plane/how-to-manage-agents"
+      },
+      {
+       "title": "Azure OpenAI monitoring data reference",
+       "url": "https://learn.microsoft.com/azure/foundry/openai/monitor-openai-reference"
+      },
+      {
+       "title": "Analyze Microsoft Foundry costs in Azure Cost Management",
+       "url": "https://learn.microsoft.com/azure/foundry/how-to/analyze-costs-cost-management"
+      }
+     ]
     }
    ]
   },
