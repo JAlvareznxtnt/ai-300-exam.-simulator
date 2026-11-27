@@ -2034,7 +2034,7 @@
      "n": 3051,
      "dom": 3,
      "type": "mc",
-     "stem": "**Solution:** Enable a system-assigned managed identity on the web app, and assign it the Cognitive Services OpenAI User role on the Foundry resource.\n\nDoes the solution meet the goal?",
+     "stem": "**Solution:** Enable a system-assigned managed identity on the web app, and assign it the Foundry User role on the Foundry resource.\n\nDoes the solution meet the goal?",
      "opts": [
       [
        "A",
@@ -2046,18 +2046,14 @@
       ]
      ],
      "correct": [
-      "A"
+      "B"
      ],
-     "rationale": "A managed identity means no secret is stored, and Cognitive Services OpenAI User allows calling model deployments without granting management rights, so it matches least privilege for inference.",
-     "hint": "Managed identity + a role that only allows inference = no secret, least privilege.",
-     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. Microsoft Learn pages differ: the Azure OpenAI role page lets Cognitive Services OpenAI User make inference calls, while the Foundry role page says not to assign Cognitive Services roles for Foundry scenarios and names Foundry User for inference.",
+     "rationale": "The managed identity means no secret is stored, but Foundry User also grants the data actions used to build and develop in a project, which is more than inference needs. It breaks the least-privilege requirement.",
+     "hint": "No stored secret is only half the goal: check what else the role allows.",
+     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. Microsoft Learn names Foundry User for calling a deployment, and also describes it as a role for developers building and testing agents. The answer is No because the role covers more than inference.",
      "syn": true,
      "seriesId": 1,
      "sources": [
-      {
-       "title": "Role-based access control for Azure OpenAI in Microsoft Foundry Models (classic)",
-       "url": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/role-based-access-control"
-      },
       {
        "title": "Role-based access control for Microsoft Foundry",
        "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
@@ -2102,7 +2098,7 @@
      "n": 3053,
      "dom": 3,
      "type": "mc",
-     "stem": "**Solution:** Enable a system-assigned managed identity on the web app, and assign it the Contributor role on the subscription.\n\nDoes the solution meet the goal?",
+     "stem": "**Solution:** Enable a system-assigned managed identity on the web app, and assign it a custom role on the Foundry resource that allows only the data actions needed to call the model.\n\nDoes the solution meet the goal?",
      "opts": [
       [
        "A",
@@ -2114,17 +2110,21 @@
       ]
      ],
      "correct": [
-      "B"
+      "A"
      ],
-     "rationale": "The identity removes the secret, but Contributor on the whole subscription is far more than inference needs. It breaks the least-privilege requirement.",
-     "hint": "Right identity, wrong role: broad Contributor fails least privilege.",
-     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
+     "rationale": "The managed identity means no secret is stored, and a custom role lets you allow only the actions the app needs, at the scope of the resource. Both parts of the goal are met.",
+     "hint": "No stored secret, plus a role limited to inference, meets the goal.",
+     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. The cited pages describe custom roles but do not list the data actions needed for inference.",
      "syn": true,
      "seriesId": 1,
      "sources": [
       {
        "title": "Role-based access control for Microsoft Foundry",
        "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
+      },
+      {
+       "title": "Authentication and authorization in Microsoft Foundry",
+       "url": "https://learn.microsoft.com/azure/foundry/concepts/authentication-authorization-foundry"
       }
      ]
     }
