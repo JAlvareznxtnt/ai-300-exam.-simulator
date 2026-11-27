@@ -18,7 +18,7 @@ Single-page AI-300 practice app. No backend, no accounts, nothing is persisted (
 - Do not read `data/*.json` in full (about 200 KB together). Search with grep or read small slices when you need a question.
 - Do not hand-edit `index.html` or `dist/`.
 - Do not add dependencies, frameworks or a bundler. The app stays one self-contained HTML file.
-- Do not add fonts or colors outside the tokens at the top of the template's CSS (`:root` and `:root[data-theme="dark"]`). Palette is white, blue, and small touches of orange. Orange also marks "synthetic".
+- Do not add fonts or colors outside the tokens at the top of the template's CSS (`:root` and `:root[data-theme="dark"]`). Palette is white and blue. Orange appears only on the Synthetic tag, the exam simulation button and low-score domain bars.
 - Do not store answers or progress anywhere. Every session starts fresh by design.
 
 ## Keep these stable (the flow test depends on them)
@@ -36,6 +36,7 @@ If you must rename one, update `tests/flow.test.js` in the same change.
 - All modes score the same way: results split into Answered correctly, Answered incorrectly and Not answered, checked or not; the headline score is correct out of answered, and domain bars count answered questions only. A partly filled slot question counts as answered. Simulation runs also show a "Full-exam estimate" with unanswered questions counted as wrong. Review order is Incorrect (only the first item open), Not answered, Correct. Retry covers the incorrect ones.
 - A question with `sources` shows "Read on Microsoft Learn" links (new tab, `rel="noopener"`) after Check answer and in the results review. Never before the answer is revealed, and not on the question grid.
 - The setup screen has a "Get started" guide under the hero: a `<button aria-expanded aria-controls>` (not a `<details>`), closed on every load, never stored. Three steps with 2-3 bullets each, icons from one set (`icon()`, 2px current-color strokes). While closed it is `inert` and hidden.
+- Calm layout: hero and guide centered, two equal setup columns with 24px gutters, spacing in multiples of 8px, cards with 16px radius and 24px padding (16px on phones) and no shadow, at most one accent color per card, no repeated helper text.
 - Respect `prefers-reduced-motion`. Motion answers a user action (question change, answer reveal, results ring and bars); no decorative loops.
 - Check the UI at 420 px wide: no horizontal scroll.
 

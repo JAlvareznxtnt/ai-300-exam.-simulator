@@ -13,7 +13,7 @@
   color-scheme:light;
   --paper:#ffffff; --mist:#f3f6fb; --ink:#0e2238; --ink-2:#4a5d73; --line:#dbe3ee; --line-2:#b9c8dc;
   --blue:#1457b8; --blue-ink:#ffffff; --blue-soft:#e8f0fc; --navy:#0b2a55; --navy-ink:#ffffff;
-  --orange:#e8730c; --orange-ink:#a84a06; --orange-soft:#fff1e3;
+  --orange:#e8730c;
   --good:#14783c; --good-soft:#e6f4ec; --bad:#b3261e; --bad-soft:#fbeae8;
   --shadow:0 1px 2px rgba(14,34,56,.06),0 6px 20px rgba(14,34,56,.06);
   --font-display:"Manrope","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
@@ -24,7 +24,7 @@
   color-scheme:dark;
   --paper:#0b1626; --mist:#10223a; --ink:#e8f0fa; --ink-2:#a3b5ca; --line:#243a57; --line-2:#35527a;
   --blue:#6db3f2; --blue-ink:#08203b; --blue-soft:#12304f; --navy:#12305a; --navy-ink:#ffffff;
-  --orange:#ffa24d; --orange-ink:#ffb674; --orange-soft:#33220f;
+  --orange:#ffa24d;
   --good:#5fcf8d; --good-soft:#143122; --bad:#ff8a80; --bad-soft:#3a1b19;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
 }
@@ -37,17 +37,14 @@ h2{font-size:1.2rem;line-height:1.25;font-weight:700}
 h3{font-size:1.02rem;line-height:1.3;font-weight:700}
 p{margin:0}
 .top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.top-in{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top-in{max-width:1080px;margin:0 auto;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:1.05rem}
 .mark{width:30px;height:30px;color:var(--blue);flex:none;overflow:visible}
-main{max-width:1080px;margin:0 auto;padding:28px 20px 72px}
+main{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
 .narrow{max-width:760px;margin:0 auto}
-.lead{color:var(--ink-2);font-size:1.08rem;max-width:62ch;margin-top:10px}
-.stats{display:flex;flex-wrap:wrap;gap:10px;list-style:none;padding:0;margin:18px 0 0}
-.stats li{background:var(--mist);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:.95rem;color:var(--ink-2)}
-.stats b{font-family:var(--font-display);color:var(--ink);font-size:1.02rem;margin-right:4px}
+.lead{color:var(--ink-2);font-size:1.08rem;margin-top:8px}
 /* "Get started" guide: opens by growing its grid row from 0fr to 1fr; reduced motion just shows or hides it */
-.guide-wrap{display:flex;flex-direction:column;align-items:flex-start;margin-top:16px}
+.guide-wrap{display:flex;flex-direction:column;align-items:center;margin-top:16px}
 #guide-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:999px}
 .ic{width:20px;height:20px;flex:none}
 #guide-toggle .chev{transition:transform .25s ease}
@@ -62,22 +59,23 @@ main{max-width:1080px;margin:0 auto;padding:28px 20px 72px}
 .step h2{font-size:1.05rem;margin:8px 0}
 .step ul{margin:0;padding-left:20px;color:var(--ink-2)}
 .step li+li{margin-top:8px}
-.setup-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;margin-top:28px;align-items:start}
-@media (min-width:920px){.setup-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
-.panel-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:24px}
-.panel-card>header{margin-bottom:18px}
+.setup-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;margin-top:32px;align-items:start}
+@media (min-width:920px){.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.panel-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
+.panel-card>header{margin-bottom:16px}
+.panel-card>.block{margin-top:24px}
+.panel-card>.note{margin-top:8px}
 .help{color:var(--ink-2);font-size:.97rem;margin-top:4px}
-.field{padding:18px 0;border-top:1px solid var(--line)}
-.field:first-of-type{border-top:0;padding-top:0}
+.field+.field{margin-top:24px}
 .field>h2{font-size:1.05rem}
-.field>.help{margin-bottom:12px}
+.field>.help{margin-bottom:8px}
 .checks{display:grid;gap:8px}
-label.check{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s,transform .15s}
-label.check:hover{border-color:var(--line-2);background:var(--mist)}
-label.check:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+label.check{display:grid;grid-template-columns:auto 1fr auto;gap:0 16px;align-items:center;min-height:48px;padding:8px 16px;background:var(--mist);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
+label.check:hover{border-color:var(--line-2)}
+label.check:has(input:checked){background:var(--blue-soft)}
 label.check .nm{font-weight:600}
-label.check .sm{grid-column:2;color:var(--ink-2);font-size:.88rem;margin-top:-2px}
-label.check .cnt{grid-column:3;grid-row:1/3;font-family:var(--font-display);font-weight:700;font-variant-numeric:tabular-nums;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:.9rem}
+label.check .sm{grid-column:2;color:var(--ink-2);font-size:.88rem}
+label.check .cnt{grid-column:3;grid-row:1/3;color:var(--ink-2);font-size:.9rem;font-variant-numeric:tabular-nums}
 label.check input{grid-row:1/3}
 input[type=checkbox],input[type=radio]{width:19px;height:19px;accent-color:var(--blue);flex:none}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -85,7 +83,7 @@ button{font:inherit;font-weight:600;cursor:pointer;border-radius:10px;border:1px
 button:hover:not(:disabled){background:var(--mist);border-color:var(--blue)}
 button:active:not(:disabled){transform:translateY(1px)}
 button:disabled{opacity:.45;cursor:not-allowed}
-button.primary{background:var(--blue);color:var(--blue-ink);border-color:var(--blue);box-shadow:0 2px 8px color-mix(in srgb,var(--blue) 35%,transparent)}
+button.primary{background:var(--blue);color:var(--blue-ink);border-color:var(--blue)}
 button.primary:hover:not(:disabled){background:var(--blue);filter:brightness(1.08)}
 button.block{width:100%;padding:13px 18px;font-size:1.05rem}
 button.ghost{border-color:transparent;background:transparent;color:var(--blue)}
@@ -95,40 +93,33 @@ input[type=number]{font:inherit;width:96px;padding:9px 10px;border:1px solid var
 .chipbtn{padding:7px 14px;border-radius:999px;font-weight:600}
 .seg{display:grid;gap:8px}
 @media (min-width:520px){.seg{grid-template-columns:1fr 1fr}}
-.seg label{display:grid;grid-template-columns:auto 1fr;gap:0 10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
-.seg label:hover{background:var(--mist)}
-.seg label:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+.seg label{display:grid;grid-template-columns:auto 1fr;align-content:center;gap:0 8px;padding:8px 16px;background:var(--mist);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.seg label:hover{border-color:var(--line-2)}
+.seg label:has(input:checked){background:var(--blue-soft)}
 .seg input{grid-row:1/3;align-self:center}
 .seg .t{font-weight:700;font-family:var(--font-display);font-size:.98rem}
 .seg .d{grid-column:2;color:var(--ink-2);font-size:.9rem;line-height:1.4}
 .tag{display:inline-flex;align-items:center;background:var(--orange);color:#1a0d00;border-radius:999px;padding:1px 10px;font-size:.78rem;font-weight:700;font-family:var(--font-display);white-space:nowrap}
 .chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--mist);border-radius:999px;padding:1px 10px;font-size:.82rem;color:var(--ink-2);white-space:nowrap}
-.toggle-row{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
-.toggle-row:hover{background:var(--mist)}
-.toggle-row:has(input:checked){border-color:var(--orange);background:var(--orange-soft)}
+.toggle-row{display:grid;grid-template-columns:auto 1fr;gap:0 16px;align-items:center;padding:8px 16px;background:var(--mist);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.toggle-row:hover{border-color:var(--line-2)}
+.toggle-row:has(input:checked){background:var(--blue-soft)}
 .toggle-row .nm{font-weight:600}
 .toggle-row .sm{grid-column:2;color:var(--ink-2);font-size:.88rem;line-height:1.4}
 .toggle-row input{grid-row:1/3}
-.toggle-row .tag{grid-column:3;grid-row:1/3}
 /* synthetic column */
-.syn-col{display:grid;gap:16px}
-.syn-head{padding:0 4px}
-.syn-head h2{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:1.3rem}
-.sim{background:var(--navy);color:var(--navy-ink);border-radius:16px;padding:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.sim::before{content:"";position:absolute;inset:0 auto 0 0;width:6px;background:var(--orange)}
+.syn-col{display:grid;gap:24px}
+.sim{background:var(--navy);color:var(--navy-ink);border-radius:16px;padding:24px}
 .sim h2{color:var(--navy-ink)}
-.sim p{color:color-mix(in srgb,var(--navy-ink) 82%,transparent);margin-top:6px;font-size:.98rem}
-.sim ul{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:14px 0 18px}
-.sim li{border:1px solid color-mix(in srgb,var(--navy-ink) 30%,transparent);border-radius:999px;padding:2px 12px;font-size:.88rem}
-button.go{background:var(--orange);border-color:var(--orange);color:#1a0d00;font-weight:800;padding:12px 20px;font-family:var(--font-display)}
+.sim p{color:color-mix(in srgb,var(--navy-ink) 82%,transparent);margin-top:8px;font-size:.98rem}
+button.go{width:100%;background:var(--orange);border-color:var(--orange);color:#1a0d00;font-weight:800;padding:12px 16px;font-family:var(--font-display)}
 button.go:hover:not(:disabled){background:var(--orange);filter:brightness(1.08);border-color:var(--orange)}
-.group{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
-.group>.help{margin-bottom:12px}
+.group h3{margin-bottom:8px}
 .picks{display:grid;gap:8px}
-.pick{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--line-2)}
+.pick{display:grid;grid-template-columns:1fr auto;gap:0 16px;align-items:center;text-align:left;padding:8px 16px;border-radius:12px;border:1px solid var(--line)}
 .pick .pt{font-weight:700}
 .pick .pm{color:var(--ink-2);font-size:.88rem;font-weight:400;grid-column:1}
-.pick svg{grid-column:2;grid-row:1/3;color:var(--blue);transition:transform .15s}
+.pick svg{grid-column:2;grid-row:1/3;color:var(--ink-2);transition:transform .15s}
 .pick:hover svg{transform:translateX(3px)}
 /* quiz */
 .qhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
@@ -141,8 +132,7 @@ button.go:hover:not(:disabled){background:var(--orange);filter:brightness(1.08);
 .stage{animation:rise .28s cubic-bezier(.2,.8,.2,1)}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.015)}100%{transform:scale(1)}}
-.qcard{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:24px}
-.qcard.synq{border-top:5px solid var(--orange)}
+.qcard{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
 .stem{font-size:1.1rem;line-height:1.6;margin-bottom:16px;max-width:70ch}
 .stem p{margin:0 0 12px}
 .stem ul{margin:0 0 12px;padding-left:22px}
@@ -209,7 +199,7 @@ pre code{background:none;padding:0}
 .feedback .verdict{font-family:var(--font-display);font-weight:800;font-size:1.05rem}
 .feedback .verdict.ok{color:var(--good)} .feedback .verdict.no{color:var(--bad)}
 .feedback p{margin-top:8px;max-width:68ch}
-.hint{background:var(--orange-soft);border:1px solid color-mix(in srgb,var(--orange) 45%,transparent);border-radius:12px;padding:10px 14px;margin:0 0 16px;animation:rise .25s}
+.hint{background:var(--blue-soft);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 16px;animation:rise .25s}
 .note{font-size:.88rem;color:var(--ink-2);margin-top:10px}
 .sources{margin-top:12px;font-size:.95rem}
 .sources ul{margin:4px 0 0;padding-left:20px}
@@ -218,7 +208,7 @@ pre code{background:none;padding:0}
 .pill-bad{color:var(--bad);font-weight:700} .pill-good{color:var(--good);font-weight:700}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .actions .spacer{flex:1}
-.panel{background:var(--mist);border:1px solid var(--line);border-left:5px solid var(--orange);border-radius:12px;padding:12px 18px;margin-bottom:16px}
+.panel{background:var(--mist);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-bottom:16px}
 .panel summary{cursor:pointer;font-weight:600;padding:2px 0}
 .panel .in{margin-top:10px;max-width:72ch}
 .panel .in p{margin:0 0 10px}
@@ -259,45 +249,41 @@ details.rev .in{padding:0 16px 16px}
 details.rev .sumtxt{flex:1 1 260px;min-width:0}
 .opts.rv .opt{cursor:default}
 .hidden{display:none}
-#theme{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;font-size:.92rem}
+#theme{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-color:transparent;border-radius:999px;font-size:.92rem}
 #theme svg{width:18px;height:18px}
-@media (max-width:560px){main{padding:20px 16px 64px}.top-in{padding:10px 16px}.panel-card,.group,.sim,.qcard{padding:18px}#theme span{display:none}#theme{padding:8px 10px}}
+@media (max-width:560px){main{padding:24px 16px 64px}.top-in{padding:8px 16px}.panel-card,.sim,.qcard{padding:16px}.syn-drop>summary{padding:16px}.syn-drop .dbody{padding:0 16px 16px}#theme span{display:none}#theme{padding:8px}}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
 .small{color:var(--ink-2);font-size:.95rem;margin:4px 0}
-.hero{max-width:760px}
+.hero{max-width:760px;margin:0 auto;text-align:center}
 .res-top .small{margin-top:6px}
 .res-top .big .small{font-weight:600}
-.field>h2{margin-bottom:4px}
-.field>h2+.seg,.field>h2+.checks{margin-top:10px}
+.field>h2{margin-bottom:8px}
 .panel .in{max-height:46vh;overflow:auto;padding-right:6px}
-.drop{border:1px solid var(--line);border-radius:14px;background:var(--paper);transition:border-color .15s,box-shadow .15s}
+.drop{border:1px solid var(--line);border-radius:12px;background:var(--paper);transition:border-color .15s}
 .drop[open]{border-color:var(--line-2)}
-.drop>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:14px;transition:background-color .15s}
+.drop>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:16px;border-radius:12px;transition:background-color .15s}
 .drop>summary::-webkit-details-marker{display:none}
 .drop>summary:hover{background:var(--mist)}
 .drop>summary::after{content:"";width:9px;height:9px;border-right:2.5px solid var(--ink-2);border-bottom:2.5px solid var(--ink-2);transform:rotate(45deg) translateY(-2px);margin-left:auto;margin-right:4px;flex:none;transition:transform .2s}
 .drop[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
 .drop .dt{font-family:var(--font-display);font-weight:700;font-size:1.05rem}
 .drop .dv{color:var(--ink-2);font-size:.92rem}
-.drop .dbody{padding:2px 16px 16px;animation:rise .22s cubic-bezier(.2,.8,.2,1)}
+.drop .dbody{padding:0 16px 16px;animation:rise .22s cubic-bezier(.2,.8,.2,1)}
 .drop-sub{display:block;color:var(--ink-2);font-size:.9rem;font-weight:400}
-.syn-drop{box-shadow:var(--shadow)}
-.syn-drop>summary{align-items:flex-start;padding:18px 20px}
+.syn-drop{border-radius:16px}
+.syn-drop>summary{align-items:flex-start;padding:24px;border-radius:16px}
 .syn-drop .dt{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:1.2rem}
-.syn-drop .dbody{padding:0 20px 20px;display:grid;gap:14px}
-.syn-drop .group{box-shadow:none;background:var(--mist);padding:16px}
-.syn-drop .pick{background:var(--paper)}
-.simtog{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;margin:14px 0 14px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--navy-ink) 30%,transparent);border-radius:12px;cursor:pointer;transition:background-color .15s}
-.simtog:hover{background:color-mix(in srgb,var(--navy-ink) 10%,transparent)}
-.simtog input{grid-row:1/3;accent-color:var(--orange)}
+.syn-drop .dbody{padding:0 24px 24px;display:grid;gap:24px}
+.simtog{display:flex;gap:16px;align-items:center;min-height:48px;margin:16px 0 8px;padding:8px 16px;background:color-mix(in srgb,var(--navy-ink) 10%,transparent);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s}
+.simtog:hover{border-color:color-mix(in srgb,var(--navy-ink) 30%,transparent)}
+.simtog input{accent-color:var(--navy-ink)}
 .simtog .nm{font-weight:700;font-family:var(--font-display);font-size:.98rem}
-.simtog .sm{grid-column:2;font-size:.86rem;opacity:.85;line-height:1.4}
-.domdrop{margin-bottom:0}
+.sim #simfacts{margin:0 0 16px;font-size:.92rem}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-in"><div class="brand"><svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2.5h8.2L19.5 8v12.2a1.3 1.3 0 0 1-1.3 1.3H6A1.3 1.3 0 0 1 4.7 20.2V3.8A1.3 1.3 0 0 1 6 2.5z" fill="currentColor" opacity=".14" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.7V8h5.3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 12.5h8M8 16h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="17.5" cy="18.5" r="2.6" fill="var(--orange)"/></svg>AI-300 Practice</div><button type="button" id="theme" aria-pressed="false"></button></div></header>
+<header class="top"><div class="top-in"><div class="brand"><svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2.5h8.2L19.5 8v12.2a1.3 1.3 0 0 1-1.3 1.3H6A1.3 1.3 0 0 1 4.7 20.2V3.8A1.3 1.3 0 0 1 6 2.5z" fill="currentColor" opacity=".14" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.7V8h5.3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 12.5h8M8 16h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="17.5" cy="18.5" r="2.6" fill="currentColor"/></svg>AI-300 Practice</div><button type="button" id="theme" aria-pressed="false"></button></div></header>
 <main id="app"></main>
 <script>
 const DATA = __DATA__;
@@ -373,19 +359,18 @@ function showSetup(prev){
     <div class="stage">
     <section class="hero">
       <h1>Practice for the AI-300 exam</h1>
-      <p class="lead">Train on ${DATA.length} questions from the question bank, or on ${SYN_TOTAL} synthetic questions in the exam's own formats. Nothing is saved, so every session starts fresh.</p>
-      <ul class="stats"><li><b>${DATA.length}</b>bank questions</li><li><b>${SYN_TOTAL}</b>synthetic questions</li><li><b>5</b>exam domains</li></ul>
+      <p class="lead">${DATA.length} bank questions and ${SYN_TOTAL} synthetic ones across five exam domains. Nothing is saved.</p>
     </section>
     ${guideHtml()}
     <div class="setup-grid">
       <section class="panel-card" aria-labelledby="bankh">
-        <header><h2 id="bankh">Question bank</h2><p class="help">Real-style questions grouped by exam domain. Pick what to practice and how.</p></header>
+        <header><h2 id="bankh">Question bank</h2></header>
         <div class="field"><details class="drop domdrop" id="domdrop"><summary><span class="dt">Domains</span><span class="dv" id="domsum"></span></summary>
-          <div class="dbody"><p class="help" style="margin:0 0 12px">The percentage is each domain's weight in the exam.</p>
+          <div class="dbody">
           <div class="checks" id="doms">
           ${[1,2,3,4,5].map(d=>`<label class="check" for="d${d}"><input type="checkbox" id="d${d}" value="${d}" ${p.doms.includes(d)?'checked':''}><span class="nm">${DOMAINS[d]}</span><span class="sm">${WEIGHT[d]} of the exam</span><span class="cnt" id="cnt${d}"></span></label>`).join('')}
           </div>
-          <div class="row" style="margin-top:12px"><button type="button" class="ghost" id="all">Select all</button><button type="button" class="ghost" id="none">Clear</button></div></div>
+          <div class="row" style="margin-top:8px"><button type="button" class="ghost" id="all">Select all</button><button type="button" class="ghost" id="none">Clear</button></div></div>
         </details></div>
         <div class="field"><h2>Number of questions</h2><p class="help" id="avail"></p>
           <div class="row">
@@ -402,7 +387,7 @@ function showSetup(prev){
         <div class="field"><h2>Options</h2>
           <div class="checks">
             <label class="check" for="sh"><input type="checkbox" id="sh" ${p.shuffle?'checked':''}><span class="nm">Shuffle question order</span></label>
-            <label class="toggle-row" for="syn"><input type="checkbox" id="syn" ${p.withSyn?'checked':''}><span class="nm">Add synthetic questions</span><span class="tag syn-badge">Synthetic</span><span class="sm">Mixes ${SYN_COUNT} high-quality synthetic single questions into this pool. Each one keeps its orange tag.</span></label>
+            <label class="toggle-row" for="syn"><input type="checkbox" id="syn" ${p.withSyn?'checked':''}><span class="nm">Add synthetic questions</span><span class="sm">Adds ${SYN_COUNT} synthetic single questions to this pool.</span></label>
           </div>
         </div>
         <button class="primary block" id="start" type="button">Start practice</button>
@@ -412,20 +397,20 @@ function showSetup(prev){
       <section class="syn-col" aria-label="Exam simulation and synthetic practice">
         <div class="sim">
           <h2>Exam simulation</h2>
-          <p>The real exam format in one run. Exam mode always applies: you can go back, a clock runs, hints are off, and results come at the end.</p>
-          <label class="simtog" for="simsyn"><input type="checkbox" id="simsyn" checked><span class="nm">Use synthetic questions</span><span class="sm" id="simsm"></span></label>
-          <ul id="simfacts"></ul>
+          <p>Exam mode: a clock runs, hints are off, and results come at the end.</p>
+          <label class="simtog" for="simsyn"><input type="checkbox" id="simsyn" checked><span class="nm">Use synthetic questions</span></label>
+          <p id="simfacts" aria-live="polite"></p>
           <button type="button" class="go" id="sim"></button>
         </div>
-        <details class="drop syn-drop" id="syndrop"><summary><span><span class="dt">Synthetic practice <span class="tag syn-badge">Synthetic</span></span><span class="drop-sub">Yes/No series, case studies and ${SYN_COUNT} single questions, all written by Claude</span></span></summary>
+        <details class="drop syn-drop" id="syndrop"><summary><span><span class="dt">Synthetic practice <span class="tag syn-badge">Synthetic</span></span><span class="drop-sub">Yes/No series, case studies and single questions</span></span></summary>
         <div class="dbody">
-        <p class="help">Written from the official skills outline, not taken from the real exam. Each question was reviewed for clarity, one clearly correct answer, similar-looking options, and accuracy against Microsoft documentation where it covers them.</p>
-        <div class="group"><h3>Yes/No series</h3><p class="help">One scenario and goal, then three proposed solutions. Decide for each whether it meets the goal.</p>
+        <p class="help">Written by Claude. Not taken from the real exam.</p>
+        <div class="group"><h3>Yes/No series</h3>
           <div class="picks">${SYN.series.map(s=>`<button type="button" class="pick serbtn" data-ser="${s.id}"><span class="pt">Series ${s.id}: ${esc(s.title)}</span><span class="pm">${s.qs.length} questions</span>${CHEV}</button>`).join('')}</div></div>
-        <div class="group"><h3>Case studies</h3><p class="help">A long scenario, then 5 questions covering security, permissions, networking, evaluation, monitoring and retraining.</p>
+        <div class="group"><h3>Case studies</h3>
           <div class="picks">${SYN.cases.map(c=>`<button type="button" class="pick casebtn" data-case="${c.id}"><span class="pt">Case ${c.id}: ${esc(c.title)}</span><span class="pm">${c.qs.length} questions</span>${CHEV}</button>`).join('')}</div></div>
-        <div class="group"><h3>Synthetic single questions</h3><p class="help">${SYN_COUNT} questions on fine-tuning, evaluation datasets, optimizers, drift, RAG tuning, RBAC, networking and more, in random order.</p>
-          <div class="row"><input type="number" id="synn" min="1" max="${SYN_COUNT}" value="20" aria-label="Number of synthetic questions"><button type="button" class="primary" id="synonly">Start</button></div></div>
+        <div class="group"><h3>Single questions</h3>
+          <div class="row"><input type="number" id="synn" min="1" max="${SYN_COUNT}" value="20" aria-label="Number of synthetic questions"><button type="button" id="synonly">Start</button></div></div>
         </div></details>
       </section>
     </div></div>`;
@@ -434,7 +419,7 @@ function showSetup(prev){
     const ws=document.getElementById('syn').checked;
     [1,2,3,4,5].forEach(d=>{
       const o=DATA.filter(q=>q.dom===d).length, s=SYN.normal.filter(q=>q.dom===d).length;
-      document.getElementById('cnt'+d).innerHTML=ws?`${o} + <span style="color:var(--orange-ink)">${s}</span>`:`${o}`;
+      document.getElementById('cnt'+d).textContent=ws?`${o} + ${s} synthetic`:`${o}`;
     });
     const pool=poolFor(sel(),ws).length;
     document.getElementById('avail').textContent=pool+' questions available in the selected domains'+(ws?' (including synthetic).':'.');
@@ -443,8 +428,7 @@ function showSetup(prev){
   };
   const simUpd=()=>{
     const on=document.getElementById('simsyn').checked;
-    document.getElementById('simfacts').innerHTML=on?'<li>50 single questions</li><li>1 Yes/No series of 3</li><li>1 case study of 5</li>':'<li>50 original bank questions</li>';
-    document.getElementById('simsm').textContent=on?'Singles, a Yes/No series and a case study, all synthetic.':'Original bank questions only. Series and case studies exist only as synthetic, so they are left out.';
+    document.getElementById('simfacts').textContent=on?'50 single questions, a Yes/No series of 3 and a case study of 5, all synthetic.':'50 original bank questions. Series and case studies exist only as synthetic, so they are left out.';
     document.getElementById('sim').textContent='Start exam simulation ('+(on?simN:50)+' questions)';
   };
   // The guide starts closed on every visit to this screen; inert keeps it away from keyboard and screen readers.
