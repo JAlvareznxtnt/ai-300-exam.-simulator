@@ -2034,7 +2034,7 @@
      "n": 3051,
      "dom": 3,
      "type": "mc",
-     "stem": "**Solution:** Enable a system-assigned managed identity on the web app, and assign it the Foundry User role on the Foundry resource.\n\nDoes the solution meet the goal?",
+     "stem": "**Solution:** Enable a system-assigned managed identity on the web app, and assign it the Owner role on the subscription.\n\nDoes the solution meet the goal?",
      "opts": [
       [
        "A",
@@ -2048,15 +2048,15 @@
      "correct": [
       "B"
      ],
-     "rationale": "The managed identity means no secret is stored, but Foundry User also grants the data actions used to build and develop in a project, which is more than inference needs. It breaks the least-privilege requirement.",
-     "hint": "No stored secret is only half the goal: check what else the role allows.",
-     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. Microsoft Learn names Foundry User for calling a deployment, and also describes it as a role for developers building and testing agents. The answer is No because the role covers more than inference.",
+     "rationale": "The managed identity means no secret is stored, but Owner on the subscription grants full access to manage all resources, including assigning roles. That is far more than inference needs, so it breaks the least-privilege requirement.",
+     "hint": "No stored secret is only half the goal: check how broad the role is.",
+     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
      "seriesId": 1,
      "sources": [
       {
-       "title": "Role-based access control for Microsoft Foundry",
-       "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
+       "title": "Azure built-in roles for Privileged",
+       "url": "https://learn.microsoft.com/azure/role-based-access-control/built-in-roles/privileged"
       },
       {
        "title": "Authentication and authorization in Microsoft Foundry",
