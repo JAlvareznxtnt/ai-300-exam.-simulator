@@ -1,6 +1,6 @@
 # Question verification
 
-**Resume from:** domain 3 (domains 5 and 2 are done).
+**Resume from:** domain 4 (domains 5, 2 and 3 are done).
 
 ## Worth verifying
 
@@ -31,19 +31,21 @@ Each question is checked against Microsoft Learn. `sources` in the data lists th
 - **Verified yes**: the cited pages support the keyed answer, after any change listed.
 - **Verified no**: they do not, or support it only in part. The question carries a note.
 - **no (docs don't confirm)**: the pages neither support nor contradict the key.
-- **no (docs contradict)**: listed under Needs your decision.
+- **no (docs contradict)** and **no (docs conflict)**: listed under Needs your decision.
 - Remarks in the last column name details the cited pages do not cover.
 
 Pages were read through the Microsoft Learn MCP server on 2026-11-27. The priority questions and domain 1 were checked before wrong-option claims were recorded.
 
 ## Needs your decision
 
-Microsoft Learn contradicts these keys. The keys are unchanged.
+Microsoft Learn contradicts these keys, or its pages disagree about them. The keys are unchanged.
 
-| Question | Key (source: the question bank) | What Microsoft Learn says | Learn source |
+| Question | Key | What Microsoft Learn says | Learn source |
 |---|---|---|---|
 | 8 | A: --traffic "version1=90, version2=10" | The values are space-separated key=value pairs in quotes, with no comma. The 90/10 split itself is right, so only the syntax in the options differs. | [az ml online-endpoint](https://learn.microsoft.com/cli/azure/ml/online-endpoint?view=azure-cli-latest)<br>[Perform safe rollout of new deployments for real-time inference](https://learn.microsoft.com/azure/machine-learning/how-to-safely-rollout-online-endpoints?view=azureml-api-2) |
 | 42 | A: BanditPolicy(slack_amount=0.35, ...) for "35% worse in ratio" | slack_factor is the ratio and slack_amount is an absolute value. No option uses slack_factor. | [Hyperparameter tuning a model (v2)](https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2)<br>[BanditPolicy Class](https://learn.microsoft.com/python/api/azure-ai-ml/azure.ai.ml.sweep.banditpolicy?view=azure-python) |
+| 25 | D: ...create a Regional Provisioned deployment... (stem requires processing only in East US) | Regional Provisioned processes within the Azure geography and might move between regions in it. No option guarantees East US only; D remains the closest. | [Deployment types for Microsoft Foundry Models](https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types)<br>[What is provisioned throughput for Foundry Models?](https://learn.microsoft.com/azure/foundry/openai/concepts/provisioned-throughput) |
+| 3051 | Synthetic. A: Yes (Cognitive Services OpenAI User meets the goal) | Two pages differ. The Azure OpenAI role page allows inference with this role; the Foundry role page says not to assign Cognitive Services roles for Foundry scenarios. Key unchanged; consider Foundry User. | [Role-based access control for Azure OpenAI in Microsoft Foundry Models (classic)](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/role-based-access-control)<br>[Role-based access control for Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry) |
 
 ## Priority questions
 
@@ -175,3 +177,34 @@ Wrong-option explanations were checked only where they state a specific technica
 | 78 | [Configure MLflow for Azure Machine Learning](https://learn.microsoft.com/azure/machine-learning/how-to-use-mlflow-configure-tracking?view=azureml-api-2) | yes | None. | Added a note that Microsoft Learn supports our grading. |
 | 82 | [Deploy and score a machine learning model by using an online endpoint](https://learn.microsoft.com/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2) | yes | None. | Added a note that Microsoft Learn supports our grading. |
 | 84 | [Troubleshoot online endpoint deployment and scoring](https://learn.microsoft.com/azure/machine-learning/how-to-troubleshoot-online-endpoints?view=azureml-api-2)<br>[CLI (v2) managed online deployment YAML schema](https://learn.microsoft.com/azure/machine-learning/reference-yaml-deployment-managed-online?view=azureml-api-2) | yes | None. | Added a note that Microsoft Learn supports our grading. |
+
+## Domain 3: GenAIOps infrastructure
+
+24 questions: 21 verified, 3 not.
+
+| Question | Source | Verified | Wrong-option claims | What changed |
+|---|---|---|---|---|
+| 3025 | [Connect to Foundry IQ (Azure AI Search) using roles](https://learn.microsoft.com/azure/search/search-security-rbac)<br>[Enable or disable role-based access control in Foundry IQ (Azure AI Search)](https://learn.microsoft.com/azure/search/search-security-enable-roles) | yes | Search Service Contributor does not give index access: rewritten to "does not allow querying an index" (supported). | One rationale sentence made precise. |
+| 3026 | [Deployment types for Microsoft Foundry Models](https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types) | yes | Global Standard can use any region; Batch is asynchronous; Developer is for evaluation: supported. | Added a note: the EU data zone can include EFTA countries such as Norway and Switzerland. |
+| 3028 | [Overview of Microsoft Foundry Models](https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview)<br>[Managed compute in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/managed-compute-overview)<br>[What is provisioned throughput for Foundry Models?](https://learn.microsoft.com/azure/foundry/openai/concepts/provisioned-throughput) | yes | Rewritten: provisioned throughput is only for Azure OpenAI models. | One rationale sentence rewritten. |
+| 3029 | [Working with models](https://learn.microsoft.com/azure/foundry/openai/how-to/working-with-models) | yes | Deleted: api-version selects the API contract. | Unsupported claim deleted. |
+| 3030 | [View evaluation results in the Microsoft Foundry portal](https://learn.microsoft.com/azure/foundry/how-to/evaluate-results) | yes | Remaining remarks are reasoning, not product claims. | No change. The page covers comparing runs against a baseline. |
+| 3031 | [Integrate prompt flow with DevOps for LLM-based applications](https://learn.microsoft.com/azure/machine-learning/prompt-flow/how-to-integrate-with-llm-app-devops?view=azureml-api-2) | no (docs don't confirm) | Deleted: playground, wiki and database rows lose history. | The page covers version control for prompt flow, not logging a commit SHA with each request. Note tagged. |
+| 3032 | [Role-based access control for Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry) | yes | None. | No change. |
+| 3033 | [Set up private networking for Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/how-to/virtual-networks) | yes | Deleted: what the other resource providers are for. | Unsupported claim deleted. |
+| 3034 | [Azure Private Endpoint private DNS zone values](https://learn.microsoft.com/azure/private-link/private-endpoint-dns) | yes | Subresources of Storage, Search and Key Vault: supported. | No change. |
+| 3035 | [Role-based access control for Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry)<br>[Role-based access control for Azure OpenAI in Microsoft Foundry Models (classic)](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/role-based-access-control)<br>[Azure built-in roles for General](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles/general) | yes | Cognitive Services OpenAI User cannot deploy fine-tuned models: supported. Rewritten: Foundry User can train and only Foundry Owner can deploy. | Rationale and hint rewritten: fine-tuning needs data and control plane permissions; Foundry Owner is the only single role with both. |
+| 3051 | [Role-based access control for Azure OpenAI in Microsoft Foundry Models (classic)](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/role-based-access-control)<br>[Role-based access control for Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry)<br>[Authentication and authorization in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/authentication-authorization-foundry) | no (docs conflict) | None. | Added a note. See Needs your decision. |
+| 3052 | [Authentication and authorization in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/authentication-authorization-foundry) | yes | Deleted: what a slot setting does. | Unsupported claim deleted. |
+| 3053 | [Role-based access control for Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry) | yes | Deleted: Contributor does not grant calling the deployment. | Unsupported claim deleted. |
+| 1001 | [Deployment types for Microsoft Foundry Models](https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types)<br>[What is provisioned throughput for Foundry Models?](https://learn.microsoft.com/azure/foundry/openai/concepts/provisioned-throughput) | yes | Batch price and 24-hour target; Developer for evaluation: supported. | No change. |
+| 1002 | [Configure managed virtual network for Microsoft Foundry projects](https://learn.microsoft.com/azure/foundry/how-to/managed-virtual-network) | yes | Deleted: Conditional Access and service tag remarks. | Unsupported claim deleted. |
+| 3058 | [Role-based access control for Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry)<br>[Azure built-in roles for General](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles/general) | yes | Rewritten: Reader also prevents running agents. | One rationale phrase removed. |
+| 3059 | [What is managed identities for Azure resources?](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview) | yes | System-assigned identity is deleted with its resource: supported. | No change. |
+| 3060 | [Azure Policy definitions deny effect](https://learn.microsoft.com/azure/governance/policy/concepts/effect-deny)<br>[What are Azure management groups?](https://learn.microsoft.com/azure/governance/management-groups/overview)<br>[Azure Policy built-in policy definitions for Foundry Tools](https://learn.microsoft.com/azure/ai-services/policy-reference) | yes | Deleted: Audit effect and network security group remarks. | Unsupported claim deleted. |
+| 3061 | [Azure Private Endpoint private DNS zone values](https://learn.microsoft.com/azure/private-link/private-endpoint-dns)<br>[Configure managed virtual network for Microsoft Foundry projects](https://learn.microsoft.com/azure/foundry/how-to/managed-virtual-network) | yes | Deleted: private endpoints take no public IP. | Unsupported claim deleted. |
+| 21 | [Model leaderboards in Microsoft Foundry portal (preview)](https://learn.microsoft.com/azure/foundry/concepts/model-benchmarks) | yes | Rewritten: playground, evaluation runs and model cards. | Rationale rewritten: the page lists quality, safety, cost and throughput, not fluency. |
+| 22 | [Role-based access control for Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry)<br>[Connect to Foundry IQ (Azure AI Search) using roles](https://learn.microsoft.com/azure/search/search-security-rbac)<br>[Authentication and authorization in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/concepts/authentication-authorization-foundry) | yes | API keys lack per-user traceability: supported. Deleted: User Access Administrator remark. | Unsupported claim deleted. |
+| 24 | [Deployment types for Microsoft Foundry Models](https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types) | yes | Rewritten: serverless deployments are region-scoped. | Rationale rewritten to the documented behaviour. |
+| 25 | [Deployment types for Microsoft Foundry Models](https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types)<br>[What is provisioned throughput for Foundry Models?](https://learn.microsoft.com/azure/foundry/openai/concepts/provisioned-throughput) | no (docs contradict) | Global Standard can process outside the region; priority is pay-per-token: supported. | Rationale fixed and note added. See Needs your decision. |
+| 67 | [Working with models](https://learn.microsoft.com/azure/foundry/openai/how-to/working-with-models) | yes | None. | Added a note: with NoAutoUpgrade the deployment stops working at retirement. |

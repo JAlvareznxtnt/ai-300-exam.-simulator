@@ -956,10 +956,20 @@
    "correct": [
     "C"
    ],
-   "rationale": "Search Index Data Reader lets an identity query indexes, which is all the agent needs, and the search service must accept role-based access. Search Service Contributor manages the service but does not grant access to index data. Keys, even in Key Vault, are secrets.",
+   "rationale": "Search Index Data Reader lets an identity query indexes, which is all the agent needs, and the search service must accept role-based access. Search Service Contributor manages the service and its objects but does not allow querying an index. Keys, even in Key Vault, are secrets.",
    "hint": "Keyless Search queries = managed identity + Search Index Data Reader.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Connect to Foundry IQ (Azure AI Search) using roles",
+     "url": "https://learn.microsoft.com/azure/search/search-security-rbac"
+    },
+    {
+     "title": "Enable or disable role-based access control in Foundry IQ (Azure AI Search)",
+     "url": "https://learn.microsoft.com/azure/search/search-security-enable-roles"
+    }
+   ]
   },
   {
    "n": 3026,
@@ -989,8 +999,14 @@
    ],
    "rationale": "Data Zone Standard keeps processing inside the chosen data zone, here the EU, with pay-per-token billing. Global Standard can route requests to any region. Global Batch is asynchronous, and Developer is for testing.",
    "hint": "Processing must stay in a geography = Data Zone. Anywhere = Global.",
-   "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. Microsoft Learn says the EU data zone follows the EU Data Boundary, which can include EFTA countries such as Norway and Switzerland.",
+   "syn": true,
+   "sources": [
+    {
+     "title": "Deployment types for Microsoft Foundry Models",
+     "url": "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types"
+    }
+   ]
   },
   {
    "n": 3027,
@@ -1098,10 +1114,24 @@
    "correct": [
     "A"
    ],
-   "rationale": "Serverless API deployments are billed per token and need no infrastructure. Managed compute uses dedicated virtual machines billed by the hour. Provisioned throughput is for Azure OpenAI models with reserved capacity, and a batch endpoint is not meant for interactive calls.",
+   "rationale": "Serverless API deployments are billed per token and need no infrastructure from you. Managed compute runs on dedicated capacity billed by time. Provisioned throughput is billed for reserved capacity rather than per token, and batch processing is not meant for interactive calls.",
    "hint": "Pay-per-token, no GPUs = serverless API. Own dedicated GPUs = managed compute.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Overview of Microsoft Foundry Models",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview"
+    },
+    {
+     "title": "Managed compute in Microsoft Foundry",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/managed-compute-overview"
+    },
+    {
+     "title": "What is provisioned throughput for Foundry Models?",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/concepts/provisioned-throughput"
+    }
+   ]
   },
   {
    "n": 3029,
@@ -1129,10 +1159,16 @@
    "correct": [
     "C"
    ],
-   "rationale": "NoAutoUpgrade keeps the deployment on its current model version (until retirement). OnceNewDefaultVersionAvailable upgrades soon after a new default is designated, and OnceCurrentVersionExpired still upgrades at retirement. The api-version selects the API contract, not the model version.",
+   "rationale": "NoAutoUpgrade keeps the deployment on its current model version (until retirement). OnceNewDefaultVersionAvailable upgrades soon after a new default is designated, and OnceCurrentVersionExpired still upgrades at retirement.",
    "hint": "Freeze the model version = NoAutoUpgrade. API version is a different thing.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Working with models",
+     "url": "https://learn.microsoft.com/azure/foundry/openai/how-to/working-with-models"
+    }
+   ]
   },
   {
    "n": 3030,
@@ -1163,7 +1199,13 @@
    "rationale": "Running both variants on one fixed dataset with the same evaluators gives comparable numbers before anything ships. Length is not quality, three hand-picked questions are not a sample, and a month in production is not a pre-merge check.",
    "hint": "Compare prompt variants = same dataset, same evaluators.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "View evaluation results in the Microsoft Foundry portal",
+     "url": "https://learn.microsoft.com/azure/foundry/how-to/evaluate-results"
+    }
+   ]
   },
   {
    "n": 3031,
@@ -1191,10 +1233,16 @@
    "correct": [
     "A"
    ],
-   "rationale": "Prompts in Git are reviewed, versioned and reproducible, and the logged SHA ties each request to the exact text. An unversioned playground edit, a wiki and an editable row all lose history.",
+   "rationale": "Prompts in Git are reviewed, versioned and reproducible, and the logged SHA ties each request to the exact text.",
    "hint": "Prompts are code: Git + tag + log the version.",
-   "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. Docs don't confirm: the cited page covers version control of prompts, not logging the commit SHA with each request.",
+   "syn": true,
+   "sources": [
+    {
+     "title": "Integrate prompt flow with DevOps for LLM-based applications",
+     "url": "https://learn.microsoft.com/azure/machine-learning/prompt-flow/how-to-integrate-with-llm-app-devops?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3032,
@@ -1225,7 +1273,13 @@
    "rationale": "Scope limits where a role applies. Foundry User (formerly Azure AI User) at the project scope lets the team build there without touching other projects. The other choices apply wider scopes or broader roles.",
    "hint": "Limit blast radius with the narrowest scope that works.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Role-based access control for Microsoft Foundry",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
+    }
+   ]
   },
   {
    "n": 3033,
@@ -1253,10 +1307,16 @@
    "correct": [
     "B"
    ],
-   "rationale": "The agent subnet is delegated to Microsoft.App/environments. The other providers are for Kubernetes, App Service plans and the Foundry resource itself.",
+   "rationale": "The agent subnet is delegated to Microsoft.App/environments.",
    "hint": "Agent Service subnet = delegate to Microsoft.App/environments.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Set up private networking for Foundry Agent Service",
+     "url": "https://learn.microsoft.com/azure/foundry/agents/how-to/virtual-networks"
+    }
+   ]
   },
   {
    "n": 3034,
@@ -1287,7 +1347,13 @@
    "rationale": "The Foundry (Azure AI services) resource uses the account subresource. blob is for Storage, searchService is for Azure AI Search, and vault is for Key Vault.",
    "hint": "Private endpoint subresource must match the service: Foundry = account.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Azure Private Endpoint private DNS zone values",
+     "url": "https://learn.microsoft.com/azure/private-link/private-endpoint-dns"
+    }
+   ]
   },
   {
    "n": 3035,
@@ -1315,10 +1381,24 @@
    "correct": [
     "A"
    ],
-   "rationale": "A Foundry User (formerly Azure AI User) can train (fine-tune) a model, but deploying the fine-tuned model requires the Foundry Owner role (formerly Azure AI Owner). Reader is read-only, and Cognitive Services OpenAI User is meant for calling deployed models.",
-   "hint": "Train = Foundry User. Train and deploy = Foundry Owner.",
+   "rationale": "Deploying a fine-tuned model is a control plane action, and fine-tuning also needs data plane permissions. Foundry Owner (formerly Azure AI Owner) is the only single built-in role with both; Foundry User together with Foundry Account Owner also works. Cognitive Services OpenAI User cannot deploy fine-tuned models, and Reader is read-only.",
+   "hint": "Fine-tune and deploy with one built-in role = Foundry Owner.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Role-based access control for Microsoft Foundry",
+     "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
+    },
+    {
+     "title": "Role-based access control for Azure OpenAI in Microsoft Foundry Models (classic)",
+     "url": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/role-based-access-control"
+    },
+    {
+     "title": "Azure built-in roles for General",
+     "url": "https://learn.microsoft.com/azure/role-based-access-control/built-in-roles/general"
+    }
+   ]
   },
   {
    "n": 3036,
@@ -1900,9 +1980,23 @@
      ],
      "rationale": "A managed identity means no secret is stored, and Cognitive Services OpenAI User allows calling model deployments without granting management rights, so it matches least privilege for inference.",
      "hint": "Managed identity + a role that only allows inference = no secret, least privilege.",
-     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
+     "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. Microsoft Learn pages differ: the Azure OpenAI role page lets Cognitive Services OpenAI User make inference calls, while the Foundry role page says not to assign Cognitive Services roles for Foundry scenarios and names Foundry User for inference.",
      "syn": true,
-     "seriesId": 1
+     "seriesId": 1,
+     "sources": [
+      {
+       "title": "Role-based access control for Azure OpenAI in Microsoft Foundry Models (classic)",
+       "url": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/role-based-access-control"
+      },
+      {
+       "title": "Role-based access control for Microsoft Foundry",
+       "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
+      },
+      {
+       "title": "Authentication and authorization in Microsoft Foundry",
+       "url": "https://learn.microsoft.com/azure/foundry/concepts/authentication-authorization-foundry"
+      }
+     ]
     },
     {
      "n": 3052,
@@ -1922,11 +2016,17 @@
      "correct": [
       "B"
      ],
-     "rationale": "An API key is a secret, and an application setting still stores it. Marking it as a slot setting only keeps it from swapping between slots.",
+     "rationale": "An API key is a secret, and an application setting still stores it.",
      "hint": "A key in app settings is still a stored secret.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "seriesId": 1
+     "seriesId": 1,
+     "sources": [
+      {
+       "title": "Authentication and authorization in Microsoft Foundry",
+       "url": "https://learn.microsoft.com/azure/foundry/concepts/authentication-authorization-foundry"
+      }
+     ]
     },
     {
      "n": 3053,
@@ -1946,11 +2046,17 @@
      "correct": [
       "B"
      ],
-     "rationale": "The identity removes the secret, but Contributor on the whole subscription is far more than inference needs, and Contributor is a management role that does not by itself grant calling the deployment. It breaks the least-privilege requirement.",
+     "rationale": "The identity removes the secret, but Contributor on the whole subscription is far more than inference needs. It breaks the least-privilege requirement.",
      "hint": "Right identity, wrong role: broad Contributor fails least privilege.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "seriesId": 1
+     "seriesId": 1,
+     "sources": [
+      {
+       "title": "Role-based access control for Microsoft Foundry",
+       "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
+      }
+     ]
     }
    ]
   },
@@ -2091,7 +2197,17 @@
      "hint": "Interactive + reserved capacity = Provisioned throughput. Asynchronous + cheapest = Global Batch.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 1,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Deployment types for Microsoft Foundry Models",
+       "url": "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types"
+      },
+      {
+       "title": "What is provisioned throughput for Foundry Models?",
+       "url": "https://learn.microsoft.com/azure/foundry/openai/concepts/provisioned-throughput"
+      }
+     ]
     },
     {
      "n": 1002,
@@ -2119,11 +2235,17 @@
      "correct": [
       "B"
      ],
-     "rationale": "Allow only approved outbound blocks everything except the rules you add. A public third-party hostname is allowed with an FQDN outbound rule. A private endpoint rule is for Azure resources you own, a service tag rule is for Azure service IP ranges, and Allow internet outbound does not restrict anything. Conditional Access governs user sign-ins, not network egress.",
+     "rationale": "Allow only approved outbound blocks everything except the rules you add. A public third-party hostname is allowed with an FQDN outbound rule. A private endpoint rule is for dependent Azure resources, and Allow internet outbound does not restrict anything.",
      "hint": "Allow only a specific public hostname = Approved outbound + FQDN rule. Azure PaaS resources = private endpoint rule.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 1,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Configure managed virtual network for Microsoft Foundry projects",
+       "url": "https://learn.microsoft.com/azure/foundry/how-to/managed-virtual-network"
+      }
+     ]
     },
     {
      "n": 1003,
@@ -2591,11 +2713,21 @@
        ]
       }
      ],
-     "rationale": "Foundry User (formerly Azure AI User) at the project scope lets developers build there without touching other projects. Reader at the resource shows configuration without allowing changes or running agents. The other combinations either give broader scope or write access.",
+     "rationale": "Foundry User (formerly Azure AI User) at the project scope lets developers build there without touching other projects. Reader at the resource shows configuration without allowing changes. The other combinations either give broader scope or write access.",
      "hint": "Developers: Foundry User at project scope. Auditors: Reader.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "caseId": 3
+     "caseId": 3,
+     "sources": [
+      {
+       "title": "Role-based access control for Microsoft Foundry",
+       "url": "https://learn.microsoft.com/azure/foundry/concepts/rbac-foundry"
+      },
+      {
+       "title": "Azure built-in roles for General",
+       "url": "https://learn.microsoft.com/azure/role-based-access-control/built-in-roles/general"
+      }
+     ]
     },
     {
      "n": 3059,
@@ -2627,7 +2759,13 @@
      "hint": "Shared and long-lived identity = user-assigned managed identity.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "caseId": 3
+     "caseId": 3,
+     "sources": [
+      {
+       "title": "What is managed identities for Azure resources?",
+       "url": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview"
+      }
+     ]
     },
     {
      "n": 3060,
@@ -2655,11 +2793,25 @@
      "correct": [
       "A"
      ],
-     "rationale": "A Deny policy blocks the creation or update of non-compliant resources, and assigning it at the management group scope covers every subscription under it. Audit only reports, manual checks do not guarantee anything, and a network security group does not govern a platform resource's public access setting.",
+     "rationale": "A Deny policy blocks the creation or update of non-compliant resources, and assigning it at the management group scope covers every subscription under it. Manual checks do not guarantee anything.",
      "hint": "Prevent = Azure Policy with Deny. Report only = Audit.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "caseId": 3
+     "caseId": 3,
+     "sources": [
+      {
+       "title": "Azure Policy definitions deny effect",
+       "url": "https://learn.microsoft.com/azure/governance/policy/concepts/effect-deny"
+      },
+      {
+       "title": "What are Azure management groups?",
+       "url": "https://learn.microsoft.com/azure/governance/management-groups/overview"
+      },
+      {
+       "title": "Azure Policy built-in policy definitions for Foundry Tools",
+       "url": "https://learn.microsoft.com/azure/ai-services/policy-reference"
+      }
+     ]
     },
     {
      "n": 3061,
@@ -2687,11 +2839,21 @@
      "correct": [
       "D"
      ],
-     "rationale": "A private endpoint only works when the service name resolves to its private IP. A private DNS zone linked to the network, with corporate DNS forwarding to it, does that (Foundry uses zones such as privatelink.cognitiveservices.azure.com, privatelink.openai.azure.com and privatelink.services.ai.azure.com). Enabling public access defeats the requirement, an outbound FQDN rule affects traffic leaving a managed network, and private endpoints do not take public IPs.",
+     "rationale": "A private endpoint only works when the service name resolves to its private IP. A private DNS zone linked to the network, with corporate DNS forwarding to it, does that (Foundry uses zones such as privatelink.cognitiveservices.azure.com, privatelink.openai.azure.com and privatelink.services.ai.azure.com). Enabling public access defeats the requirement, and an outbound FQDN rule affects traffic leaving a managed network.",
      "hint": "Private endpoint + wrong IP = fix DNS (private DNS zone).",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "caseId": 3
+     "caseId": 3,
+     "sources": [
+      {
+       "title": "Azure Private Endpoint private DNS zone values",
+       "url": "https://learn.microsoft.com/azure/private-link/private-endpoint-dns"
+      },
+      {
+       "title": "Configure managed virtual network for Microsoft Foundry projects",
+       "url": "https://learn.microsoft.com/azure/foundry/how-to/managed-virtual-network"
+      }
+     ]
     }
    ]
   }
