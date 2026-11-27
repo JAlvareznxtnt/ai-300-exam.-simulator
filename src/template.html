@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-300 Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky slim header, then a two-column setup (question bank left, synthetic practice right), one question per screen, then results. */
+:root{
+  color-scheme:light;
+  --paper:#ffffff; --mist:#f3f6fb; --ink:#0e2238; --ink-2:#4a5d73; --line:#dbe3ee; --line-2:#b9c8dc;
+  --blue:#1457b8; --blue-ink:#ffffff; --blue-soft:#e8f0fc; --navy:#0b2a55; --navy-ink:#ffffff;
+  --orange:#e8730c;
+  --good:#14783c; --good-soft:#e6f4ec; --bad:#b3261e; --bad-soft:#fbeae8;
+  --shadow:0 1px 2px rgba(14,34,56,.06),0 6px 20px rgba(14,34,56,.06);
+  --font-display:"Manrope","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --font-body:"Source Sans 3","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#0b1626; --mist:#10223a; --ink:#e8f0fa; --ink-2:#a3b5ca; --line:#243a57; --line-2:#35527a;
+  --blue:#6db3f2; --blue-ink:#08203b; --blue-soft:#12304f; --navy:#12305a; --navy-ink:#ffffff;
+  --orange:#ffa24d;
+  --good:#5fcf8d; --good-soft:#143122; --bad:#ff8a80; --bad-soft:#3a1b19;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6;transition:background-color .25s,color .25s}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(1.7rem,4.5vw,2.3rem);line-height:1.15;font-weight:800}
+h2{font-size:1.2rem;line-height:1.25;font-weight:700}
+h3{font-size:1.02rem;line-height:1.3;font-weight:700}
+p{margin:0}
+.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1080px;margin:0 auto;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:1.05rem}
+.mark{width:30px;height:30px;color:var(--blue);flex:none;overflow:visible}
+main{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+.narrow{max-width:760px;margin:0 auto}
+.lead{color:var(--ink-2);font-size:1.08rem;margin-top:8px}
+/* "Get started" guide: opens by growing its grid row from 0fr to 1fr; reduced motion just shows or hides it */
+.guide-wrap{display:flex;flex-direction:column;align-items:center;margin-top:16px}
+#guide-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:999px}
+.ic{width:20px;height:20px;flex:none}
+#guide-toggle .chev{transition:transform .25s ease}
+#guide-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.guide{display:grid;grid-template-rows:0fr;width:100%;opacity:0;visibility:hidden;transition:grid-template-rows .25s ease,opacity .25s ease,visibility 0s linear .25s}
+.guide.open{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows .25s ease,opacity .25s ease,visibility 0s}
+.guide-clip{min-height:0;overflow:hidden}
+.steps{list-style:none;margin:0;padding:16px 0 0;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:760px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.step{background:var(--mist);border-radius:16px;padding:16px}
+.step>.ic{width:24px;height:24px}
+.step h2{font-size:1.05rem;margin:8px 0}
+.step ul{margin:0;padding-left:20px;color:var(--ink-2)}
+.step li+li{margin-top:8px}
+.setup-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;margin-top:32px;align-items:start}
+@media (min-width:920px){.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.panel-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
+.panel-card>header{margin-bottom:16px}
+.panel-card>.block{margin-top:24px}
+.panel-card>.note{margin-top:8px}
+.help{color:var(--ink-2);font-size:.97rem;margin-top:4px}
+.field+.field{margin-top:24px}
+.field>h2{font-size:1.05rem}
+.field>.help{margin-bottom:8px}
+.checks{display:grid;gap:8px}
+label.check{display:grid;grid-template-columns:auto 1fr auto;gap:0 16px;align-items:center;min-height:48px;padding:8px 16px;background:var(--mist);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
+label.check:hover{border-color:var(--line-2)}
+label.check:has(input:checked){background:var(--blue-soft)}
+label.check .nm{font-weight:600}
+label.check .sm{grid-column:2;color:var(--ink-2);font-size:.88rem}
+label.check .cnt{grid-column:3;grid-row:1/3;color:var(--ink-2);font-size:.9rem;font-variant-numeric:tabular-nums}
+label.check input{grid-row:1/3}
+input[type=checkbox],input[type=radio]{width:19px;height:19px;accent-color:var(--blue);flex:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:10px;border:1px solid var(--line-2);background:var(--paper);color:var(--ink);padding:9px 16px;transition:background-color .15s,border-color .15s,transform .1s,box-shadow .15s}
+button:hover:not(:disabled){background:var(--mist);border-color:var(--blue)}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--blue);color:var(--blue-ink);border-color:var(--blue)}
+button.primary:hover:not(:disabled){background:var(--blue);filter:brightness(1.08)}
+button.block{width:100%;padding:13px 18px;font-size:1.05rem}
+button.ghost{border-color:transparent;background:transparent;color:var(--blue)}
+button.ghost:hover:not(:disabled){background:var(--blue-soft);border-color:transparent}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+input[type=number]{font:inherit;width:96px;padding:9px 10px;border:1px solid var(--line-2);border-radius:10px;background:var(--paper);color:var(--ink)}
+.chipbtn{padding:7px 14px;border-radius:999px;font-weight:600}
+.seg{display:grid;gap:8px}
+@media (min-width:520px){.seg{grid-template-columns:1fr 1fr}}
+.seg label{display:grid;grid-template-columns:auto 1fr;align-content:center;gap:0 8px;padding:8px 16px;background:var(--mist);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.seg label:hover{border-color:var(--line-2)}
+.seg label:has(input:checked){background:var(--blue-soft)}
+.seg input{grid-row:1/3;align-self:center}
+.seg .t{font-weight:700;font-family:var(--font-display);font-size:.98rem}
+.seg .d{grid-column:2;color:var(--ink-2);font-size:.9rem;line-height:1.4}
+.tag{display:inline-flex;align-items:center;background:var(--orange);color:#1a0d00;border-radius:999px;padding:1px 10px;font-size:.78rem;font-weight:700;font-family:var(--font-display);white-space:nowrap}
+.chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--mist);border-radius:999px;padding:1px 10px;font-size:.82rem;color:var(--ink-2);white-space:nowrap}
+.toggle-row{display:grid;grid-template-columns:auto 1fr;gap:0 16px;align-items:center;padding:8px 16px;background:var(--mist);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.toggle-row:hover{border-color:var(--line-2)}
+.toggle-row:has(input:checked){background:var(--blue-soft)}
+.toggle-row .nm{font-weight:600}
+.toggle-row .sm{grid-column:2;color:var(--ink-2);font-size:.88rem;line-height:1.4}
+.toggle-row input{grid-row:1/3}
+/* synthetic column */
+.syn-col{display:grid;gap:24px}
+.sim{background:var(--navy);color:var(--navy-ink);border-radius:16px;padding:24px}
+.sim h2{color:var(--navy-ink)}
+.sim p{color:color-mix(in srgb,var(--navy-ink) 82%,transparent);margin-top:8px;font-size:.98rem}
+button.go{width:100%;background:var(--orange);border-color:var(--orange);color:#1a0d00;font-weight:800;padding:12px 16px;font-family:var(--font-display)}
+button.go:hover:not(:disabled){background:var(--orange);filter:brightness(1.08);border-color:var(--orange)}
+.group h3{margin-bottom:8px}
+.picks{display:grid;gap:8px}
+.pick{display:grid;grid-template-columns:1fr auto;gap:0 16px;align-items:center;text-align:left;padding:8px 16px;border-radius:12px;border:1px solid var(--line)}
+.pick .pt{font-weight:700}
+.pick .pm{color:var(--ink-2);font-size:.88rem;font-weight:400;grid-column:1}
+.pick svg{grid-column:2;grid-row:1/3;color:var(--ink-2);transition:transform .15s}
+.pick:hover svg{transform:translateX(3px)}
+/* quiz */
+.qhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.qcount{font-family:var(--font-display);font-weight:800;font-size:1.25rem}
+.qcount span{color:var(--ink-2);font-weight:600;font-size:1rem;margin-left:6px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#clock{font-variant-numeric:tabular-nums;font-family:var(--font-display);font-weight:700;color:var(--ink-2)}
+.bar{height:8px;background:var(--mist);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:12px 0 20px}
+.bar>i{display:block;height:100%;background:var(--blue);border-radius:999px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.stage{animation:rise .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.015)}100%{transform:scale(1)}}
+.qcard{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
+.stem{font-size:1.1rem;line-height:1.6;margin-bottom:16px;max-width:70ch}
+.stem p{margin:0 0 12px}
+.stem ul{margin:0 0 12px;padding-left:22px}
+.stem li{margin-bottom:4px}
+.instr{display:inline-block;color:var(--ink-2);font-size:.9rem;font-weight:600;margin-bottom:10px}
+pre{background:var(--mist);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto;font-family:var(--font-mono);font-size:.86rem;line-height:1.5;margin:0 0 12px}
+code{font-family:var(--font-mono);font-size:.88em;background:var(--mist);border-radius:5px;padding:1px 5px}
+pre code{background:none;padding:0}
+.opts{display:grid;gap:10px;margin-bottom:16px}
+.opt{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;min-width:0;transition:border-color .15s,background-color .15s,transform .15s,box-shadow .15s}
+.opt:hover:not(.locked){border-color:var(--blue);transform:translateY(-1px);box-shadow:0 4px 12px rgba(14,34,56,.08)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .L{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--mist);border:1px solid var(--line-2);font-family:var(--font-display);font-weight:800;font-size:.9rem;transition:background-color .15s,color .15s,border-color .15s}
+.opt .T{min-width:0;overflow-wrap:anywhere}
+.opt .T p{margin:0}
+.opt .mk{width:24px;text-align:center;font-weight:800;font-size:1.1rem}
+.opt:focus-within{outline:3px solid var(--blue);outline-offset:2px}
+.opt.sel{border-color:var(--blue);background:var(--blue-soft)}
+.opt.sel .L{background:var(--blue);color:var(--blue-ink);border-color:var(--blue)}
+.opt.right{border-color:var(--good);background:var(--good-soft);animation:pop .35s}
+.opt.right .L{background:var(--good);color:var(--paper);border-color:var(--good)}
+.opt.right .mk::after{content:"\2713";color:var(--good)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .L{background:var(--bad);color:var(--paper);border-color:var(--bad)}
+.opt.wrong .mk::after{content:"\2715";color:var(--bad)}
+.opt.locked{cursor:default}
+/* drag-and-drop board: option pool, then the slots (side by side when there is room) */
+.dnd{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-bottom:16px;align-items:start}
+@media (min-width:680px){.dnd{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}}
+.pool,.targets{display:grid;gap:8px;align-content:start;min-width:0}
+.pool{background:var(--mist);border:1.5px solid var(--line);border-radius:12px;padding:10px;transition:border-color .15s,background-color .15s}
+.piece,.slotbtn{text-align:left;min-width:0;min-height:46px;padding:9px 12px;line-height:1.4;overflow-wrap:anywhere;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* only things that can be dragged block touch scrolling */
+.piece,.slot.filled .slotbtn{cursor:grab;touch-action:none}
+.piece.used{opacity:.4;touch-action:auto}
+.dnd.locked .piece,.dnd.locked .slot .slotbtn{touch-action:auto}
+.slot{display:grid;gap:6px;min-width:0;background:var(--mist);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;transition:border-color .15s,background-color .15s}
+.sl{font-weight:600;overflow-wrap:anywhere}
+.slotrow{display:flex;gap:8px;align-items:stretch}
+.slotbtn{flex:1}
+.slot:not(.filled) .slotbtn{border:2px dashed var(--line-2);color:var(--ink-2);font-weight:400}
+.slot.filled .slotbtn{border-color:var(--blue)}
+.unslot{flex:none;width:46px;padding:0}
+.slotmk{display:none;flex:none;width:26px;align-self:center;text-align:center;font-weight:800;font-size:1.15rem}
+.dnd .piece.held,.dnd .slot.held .slotbtn{background:var(--blue-soft);border-color:var(--blue);box-shadow:0 0 0 2px var(--blue)}
+.dnd .pool.over,.dnd .slot.over{border-color:var(--blue);background:var(--blue-soft);box-shadow:0 0 0 2px var(--blue)}
+.dnd .slot.over .slotbtn{border-color:var(--blue)}
+.dnd .lifted{opacity:.45}
+.ghost-drag{position:fixed;z-index:30;pointer-events:none;background:var(--paper);color:var(--ink);border:2px solid var(--blue);border-radius:10px;box-shadow:var(--shadow);padding:9px 12px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+.dnd.locked .piece:not(.used),.dnd.locked .slotbtn{opacity:1;cursor:default}
+.dnd.locked .slotmk{display:block}
+.dnd .slot.right{border-color:var(--good);background:var(--good-soft);animation:pop .35s}
+.dnd .slot.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.dnd .slot.right .slotbtn{border-color:var(--good)}
+.dnd .slot.wrong .slotbtn{border-color:var(--bad)}
+.slot.right .slotmk{color:var(--good)}
+.slot.wrong .slotmk{color:var(--bad)}
+.fix{overflow-wrap:anywhere}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.slotres{margin:10px 0;padding-left:20px}
+.slotres li{margin-bottom:4px}
+.feedback{border:1px solid var(--line);border-left:5px solid var(--line-2);padding:14px 16px;margin:0 0 16px;border-radius:12px;background:var(--mist);animation:rise .3s cubic-bezier(.2,.8,.2,1)}
+.feedback.ok{border-left-color:var(--good)} .feedback.no{border-left-color:var(--bad)}
+.feedback .verdict{font-family:var(--font-display);font-weight:800;font-size:1.05rem}
+.feedback .verdict.ok{color:var(--good)} .feedback .verdict.no{color:var(--bad)}
+.feedback p{margin-top:8px;max-width:68ch}
+.hint{background:var(--blue-soft);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 16px;animation:rise .25s}
+.note{font-size:.88rem;color:var(--ink-2);margin-top:10px}
+.sources{margin-top:12px;font-size:.95rem}
+.sources ul{margin:4px 0 0;padding-left:20px}
+.sources li{margin-bottom:4px;overflow-wrap:anywhere}
+.sources a{color:var(--blue)}
+.pill-bad{color:var(--bad);font-weight:700} .pill-good{color:var(--good);font-weight:700}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.actions .spacer{flex:1}
+.panel{background:var(--mist);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-bottom:16px}
+.panel summary{cursor:pointer;font-weight:600;padding:2px 0}
+.panel .in{margin-top:10px;max-width:72ch}
+.panel .in p{margin:0 0 10px}
+.panel .in ul{margin:0 0 10px;padding-left:22px}
+.quit{margin-top:14px}
+/* review screen: each state has a mark (and border style) as well as a color */
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;padding:0;margin:12px 0 0;font-size:.9rem;color:var(--ink-2)}
+.legend li{display:flex;align-items:center;gap:7px}
+.key{display:grid;place-items:center;min-width:28px;height:28px;padding:0 4px;border:1.5px solid var(--line-2);border-radius:8px;font-weight:800;font-size:.8rem;color:var(--ink)}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px;margin:18px 0 20px}
+.qgrid button{display:grid;place-items:center;align-content:center;min-height:52px;min-width:0;padding:3px 0;line-height:1.15;font-family:var(--font-display);font-weight:800;font-variant-numeric:tabular-nums}
+.qgrid button.answered,.key.answered{background:var(--blue-soft);border-color:var(--blue)}
+.qgrid button.unanswered,.key.unanswered{border-style:dashed}
+.qgrid button.correct,.key.correct{background:var(--good-soft);border-color:var(--good)}
+.qgrid button.incorrect,.key.incorrect{background:var(--bad-soft);border-color:var(--bad)}
+.qgrid button.now,.key.now{border-width:3px;border-color:var(--ink)}
+.qgrid button.now .no,.key.now{text-decoration:underline;text-underline-offset:3px}
+.qgrid button:hover:not(:disabled){box-shadow:0 4px 12px rgba(14,34,56,.14)}
+/* results */
+.res-top{display:grid;gap:20px;align-items:center;grid-template-columns:auto 1fr}
+@media (max-width:520px){.res-top{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.ring{position:relative;width:150px;height:150px}
+.ring svg{transform:rotate(-90deg)}
+.ring .trk{stroke:var(--mist);} .ring .val{stroke:var(--blue);stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:2.1rem;font-variant-numeric:tabular-nums}
+.res-top .big{font-family:var(--font-display);font-weight:800;font-size:1.6rem}
+.dom{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;margin:12px 0}
+.dom .nm{font-weight:600}
+.dom .vl{color:var(--ink-2);font-size:.92rem;font-variant-numeric:tabular-nums}
+.dom .bar{margin:0;grid-column:1/-1;height:10px}
+.dom .bar>i{transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.dom .bar>i.low{background:var(--orange)}
+.section-title{margin:28px 0 12px}
+details.rev{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--paper);transition:border-color .15s}
+details.rev[open]{border-color:var(--line-2);box-shadow:var(--shadow)}
+details.rev summary{padding:12px 14px;cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+details.rev .in{padding:0 16px 16px}
+details.rev .sumtxt{flex:1 1 260px;min-width:0}
+.opts.rv .opt{cursor:default}
+.hidden{display:none}
+#theme{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-color:transparent;border-radius:999px;font-size:.92rem}
+#theme svg{width:18px;height:18px}
+@media (max-width:560px){main{padding:24px 16px 64px}.top-in{padding:8px 16px}.panel-card,.sim,.qcard{padding:16px}.syn-drop>summary{padding:16px}.syn-drop .dbody{padding:0 16px 16px}#theme span{display:none}#theme{padding:8px}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.small{color:var(--ink-2);font-size:.95rem;margin:4px 0}
+.hero{max-width:760px;margin:0 auto;text-align:center}
+.res-top .small{margin-top:6px}
+.res-top .big .small{font-weight:600}
+.field>h2{margin-bottom:8px}
+.panel .in{max-height:46vh;overflow:auto;padding-right:6px}
+.drop{border:1px solid var(--line);border-radius:12px;background:var(--paper);transition:border-color .15s}
+.drop[open]{border-color:var(--line-2)}
+.drop>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:16px;border-radius:12px;transition:background-color .15s}
+.drop>summary::-webkit-details-marker{display:none}
+.drop>summary:hover{background:var(--mist)}
+.drop>summary::after{content:"";width:9px;height:9px;border-right:2.5px solid var(--ink-2);border-bottom:2.5px solid var(--ink-2);transform:rotate(45deg) translateY(-2px);margin-left:auto;margin-right:4px;flex:none;transition:transform .2s}
+.drop[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
+.drop .dt{font-family:var(--font-display);font-weight:700;font-size:1.05rem}
+.drop .dv{color:var(--ink-2);font-size:.92rem}
+.drop .dbody{padding:0 16px 16px;animation:rise .22s cubic-bezier(.2,.8,.2,1)}
+.drop-sub{display:block;color:var(--ink-2);font-size:.9rem;font-weight:400}
+.syn-drop{border-radius:16px}
+.syn-drop>summary{align-items:flex-start;padding:24px;border-radius:16px}
+.syn-drop .dt{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:1.2rem}
+.syn-drop .dbody{padding:0 24px 24px;display:grid;gap:24px}
+.simtog{display:flex;gap:16px;align-items:center;min-height:48px;margin:16px 0 8px;padding:8px 16px;background:color-mix(in srgb,var(--navy-ink) 10%,transparent);border:1px solid transparent;border-radius:12px;cursor:pointer;transition:border-color .15s}
+.simtog:hover{border-color:color-mix(in srgb,var(--navy-ink) 30%,transparent)}
+.simtog input{accent-color:var(--navy-ink)}
+.simtog .nm{font-weight:700;font-family:var(--font-display);font-size:.98rem}
+.sim #simfacts{margin:0 0 16px;font-size:.92rem}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><div class="brand"><svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2.5h8.2L19.5 8v12.2a1.3 1.3 0 0 1-1.3 1.3H6A1.3 1.3 0 0 1 4.7 20.2V3.8A1.3 1.3 0 0 1 6 2.5z" fill="currentColor" opacity=".14" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.7V8h5.3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 12.5h8M8 16h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="17.5" cy="18.5" r="2.6" fill="currentColor"/></svg>AI-300 Practice</div><button type="button" id="theme" aria-pressed="false"></button></div></header>
+<main id="app"></main>
+<script>
+const DATA = __DATA__;
+const SYN = __SYN__;
+const DOMAINS = {1:"MLOps infrastructure",2:"ML model lifecycle",3:"GenAIOps infrastructure",4:"GenAI QA and observability",5:"Optimize GenAI"};
+const WEIGHT = {1:"15-20%",2:"25-30%",3:"20-25%",4:"10-15%",5:"10-15%"};
+const app = document.getElementById('app');
+let S = null; // session state
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function inline(s){
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+  return s;
+}
+function md(src){
+  const lines = String(src).split('\n'); let out = '', i = 0, para = [], list = [];
+  const flushP=()=>{ if(para.length){ out+='<p>'+inline(para.join(' '))+'</p>'; para=[]; } };
+  const flushL=()=>{ if(list.length){ out+='<ul>'+list.map(x=>'<li>'+inline(x)+'</li>').join('')+'</ul>'; list=[]; } };
+  while(i<lines.length){
+    const l = lines[i];
+    if(l.trim().startsWith('```')){
+      flushP(); flushL(); i++; const buf=[];
+      while(i<lines.length && !lines[i].trim().startsWith('```')){ buf.push(lines[i]); i++; }
+      i++; out += '<pre><code>'+esc(buf.join('\n'))+'</code></pre>'; continue;
+    }
+    const t = l.trim();
+    if(!t){ flushP(); flushL(); i++; continue; }
+    const m = t.match(/^(?:[-•○]|\d+\.)\s+(.*)$/);
+    if(m){ flushP(); list.push(m[1]); i++; continue; }
+    flushL(); para.push(t); i++;
+  }
+  flushP(); flushL(); return out;
+}
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function setEq(a,b){ return a.length===b.length && a.every(x=>b.includes(x)); }
+
+/* ---------- setup ---------- */
+const SIM_MIX={1:10,2:14,3:11,4:7,5:8};
+const SYN_COUNT=SYN.normal.length;
+const SYN_TOTAL=SYN_COUNT+SYN.series.reduce((a,s)=>a+s.qs.length,0)+SYN.cases.reduce((a,c)=>a+c.qs.length,0);
+const REDUCE=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CHEV='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+function poolFor(doms,withSyn){
+  return DATA.filter(q=>doms.includes(q.dom)).concat(withSyn?SYN.normal.filter(q=>doms.includes(q.dom)):[]);
+}
+function modeNow(){ const m=app.querySelector('input[name=mode]:checked'); return m?m.value:'practice'; }
+/* "Get started" guide. One icon set: 24px grid, 2px current-color strokes. */
+const icon=(paths,cls)=>`<svg class="ic${cls?' '+cls:''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+const GUIDE=[
+  {title:'Choose how to practice',icon:'<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
+   points:['Take a full exam simulation','Pick one domain, or set the number of questions','Try a case study or a Yes/No series']},
+  {title:'Answer',icon:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+   points:['Practice: check answers when you want. Exam mode and the simulation: results at the end','Use Review to jump to any question','Ordering and matching questions are drag-and-drop; tapping works too']},
+  {title:'Review',icon:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M8.500 11l2 2 3.500-4"/>',
+   points:['See what you missed, and why','Open the Microsoft Learn links on checked questions','The orange <span class="tag syn-badge">Synthetic</span> tag marks questions written for practice']}
+];
+function guideHtml(){
+  return `<div class="guide-wrap">
+    <button type="button" id="guide-toggle" aria-expanded="false" aria-controls="guide">${icon('<circle cx="12" cy="12" r="9"/><path d="M10 8.500l6 3.500-6 3.500z"/>')}<span>Get started</span>${icon('<path d="M6 9l6 6 6-6"/>','chev')}</button>
+    <div class="guide" id="guide" inert><div class="guide-clip"><ol class="steps">
+      ${GUIDE.map(s=>`<li class="step">${icon(s.icon)}<h2>${s.title}</h2><ul>${s.points.map(t=>`<li>${t}</li>`).join('')}</ul></li>`).join('')}
+    </ol></div></div>
+  </div>`;
+}
+function showSetup(prev){
+  if(S&&S.timer){clearInterval(S.timer);S.timer=null;}
+  S=null;
+  const p = Object.assign({doms:[1,2,3,4,5], n:20, mode:'practice', shuffle:true, withSyn:false}, prev||{});
+  const simN=Object.values(SIM_MIX).reduce((a,b)=>a+b,0)+3+5;
+  app.innerHTML = `
+    <div class="stage">
+    <section class="hero">
+      <h1>Practice for the AI-300 exam</h1>
+      <p class="lead">${DATA.length} bank questions and ${SYN_TOTAL} synthetic ones across five exam domains. Nothing is saved.</p>
+    </section>
+    ${guideHtml()}
+    <div class="setup-grid">
+      <section class="panel-card" aria-labelledby="bankh">
+        <header><h2 id="bankh">Question bank</h2></header>
+        <div class="field"><details class="drop domdrop" id="domdrop"><summary><span class="dt">Domains</span><span class="dv" id="domsum"></span></summary>
+          <div class="dbody">
+          <div class="checks" id="doms">
+          ${[1,2,3,4,5].map(d=>`<label class="check" for="d${d}"><input type="checkbox" id="d${d}" value="${d}" ${p.doms.includes(d)?'checked':''}><span class="nm">${DOMAINS[d]}</span><span class="sm">${WEIGHT[d]} of the exam</span><span class="cnt" id="cnt${d}"></span></label>`).join('')}
+          </div>
+          <div class="row" style="margin-top:8px"><button type="button" class="ghost" id="all">Select all</button><button type="button" class="ghost" id="none">Clear</button></div></div>
+        </details></div>
+        <div class="field"><h2>Number of questions</h2><p class="help" id="avail"></p>
+          <div class="row">
+            <input type="number" id="n" min="1" value="${p.n}" aria-label="Number of questions">
+            <button type="button" class="chipbtn" data-n="10">10</button><button type="button" class="chipbtn" data-n="20">20</button><button type="button" class="chipbtn" data-n="40">40</button><button type="button" class="chipbtn" data-n="999">All</button>
+          </div>
+        </div>
+        <div class="field"><h2>Mode</h2>
+          <div class="seg">
+            <label for="m1"><input type="radio" name="mode" id="m1" value="practice" ${p.mode==='practice'?'checked':''}><span class="t">Practice</span><span class="d">Check answers when you want</span></label>
+            <label for="m2"><input type="radio" name="mode" id="m2" value="exam" ${p.mode==='exam'?'checked':''}><span class="t">Exam</span><span class="d">Results at the end, you can go back</span></label>
+          </div>
+        </div>
+        <div class="field"><h2>Options</h2>
+          <div class="checks">
+            <label class="check" for="sh"><input type="checkbox" id="sh" ${p.shuffle?'checked':''}><span class="nm">Shuffle question order</span></label>
+            <label class="toggle-row" for="syn"><input type="checkbox" id="syn" ${p.withSyn?'checked':''}><span class="nm">Add synthetic questions</span><span class="sm">Adds ${SYN_COUNT} synthetic single questions to this pool.</span></label>
+          </div>
+        </div>
+        <button class="primary block" id="start" type="button">Start practice</button>
+        <p class="note">Some answers come from the platform's own key and some from our grading. Questions marked that way say so after you answer.</p>
+      </section>
+
+      <section class="syn-col" aria-label="Exam simulation and synthetic practice">
+        <div class="sim">
+          <h2>Exam simulation</h2>
+          <p>Exam mode: a clock runs, hints are off, and results come at the end.</p>
+          <label class="simtog" for="simsyn"><input type="checkbox" id="simsyn" checked><span class="nm">Use synthetic questions</span></label>
+          <p id="simfacts" aria-live="polite"></p>
+          <button type="button" class="go" id="sim"></button>
+        </div>
+        <details class="drop syn-drop" id="syndrop"><summary><span><span class="dt">Synthetic practice <span class="tag syn-badge">Synthetic</span></span><span class="drop-sub">Yes/No series, case studies and single questions</span></span></summary>
+        <div class="dbody">
+        <p class="help">Written by Claude. Not taken from the real exam.</p>
+        <div class="group"><h3>Yes/No series</h3>
+          <div class="picks">${SYN.series.map(s=>`<button type="button" class="pick serbtn" data-ser="${s.id}"><span class="pt">Series ${s.id}: ${esc(s.title)}</span><span class="pm">${s.qs.length} questions</span>${CHEV}</button>`).join('')}</div></div>
+        <div class="group"><h3>Case studies</h3>
+          <div class="picks">${SYN.cases.map(c=>`<button type="button" class="pick casebtn" data-case="${c.id}"><span class="pt">Case ${c.id}: ${esc(c.title)}</span><span class="pm">${c.qs.length} questions</span>${CHEV}</button>`).join('')}</div></div>
+        <div class="group"><h3>Single questions</h3>
+          <div class="row"><input type="number" id="synn" min="1" max="${SYN_COUNT}" value="20" aria-label="Number of synthetic questions"><button type="button" id="synonly">Start</button></div></div>
+        </div></details>
+      </section>
+    </div></div>`;
+  const sel=()=>[...app.querySelectorAll('#doms input[type=checkbox]')].filter(x=>x.checked).map(x=>+x.value);
+  const upd=()=>{
+    const ws=document.getElementById('syn').checked;
+    [1,2,3,4,5].forEach(d=>{
+      const o=DATA.filter(q=>q.dom===d).length, s=SYN.normal.filter(q=>q.dom===d).length;
+      document.getElementById('cnt'+d).textContent=ws?`${o} + ${s} synthetic`:`${o}`;
+    });
+    const pool=poolFor(sel(),ws).length;
+    document.getElementById('avail').textContent=pool+' questions available in the selected domains'+(ws?' (including synthetic).':'.');
+    document.getElementById('start').disabled=pool===0;
+    const k=sel().length; document.getElementById('domsum').textContent=k===5?'All 5 selected':(k===0?'None selected':k+' of 5 selected');
+  };
+  const simUpd=()=>{
+    const on=document.getElementById('simsyn').checked;
+    document.getElementById('simfacts').textContent=on?'50 single questions, a Yes/No series of 3 and a case study of 5, all synthetic.':'50 original bank questions. Series and case studies exist only as synthetic, so they are left out.';
+    document.getElementById('sim').textContent='Start exam simulation ('+(on?simN:50)+' questions)';
+  };
+  // The guide starts closed on every visit to this screen; inert keeps it away from keyboard and screen readers.
+  const toggle=document.getElementById('guide-toggle'), guide=document.getElementById('guide');
+  toggle.onclick=()=>{ const open=toggle.getAttribute('aria-expanded')!=='true'; toggle.setAttribute('aria-expanded',open); guide.classList.toggle('open',open); guide.inert=!open; };
+  document.getElementById('simsyn').addEventListener('change',simUpd);
+  app.querySelectorAll('#doms input').forEach(c=>c.addEventListener('change',upd));
+  document.getElementById('syn').addEventListener('change',upd);
+  document.getElementById('all').onclick=()=>{app.querySelectorAll('#doms input').forEach(c=>c.checked=true);upd();};
+  document.getElementById('none').onclick=()=>{app.querySelectorAll('#doms input').forEach(c=>c.checked=false);upd();};
+  app.querySelectorAll('button[data-n]').forEach(b=>b.onclick=()=>{document.getElementById('n').value=b.dataset.n;});
+  document.getElementById('start').onclick=()=>{
+    const doms=sel(); const n=Math.max(1,parseInt(document.getElementById('n').value)||20);
+    const mode=modeNow(); const sh=document.getElementById('sh').checked; const withSyn=document.getElementById('syn').checked;
+    let pool=poolFor(doms,withSyn); pool = sh? shuffle(pool): pool.slice();
+    pool=pool.slice(0,Math.min(n,pool.length));
+    startSession(pool,{doms,n,mode,shuffle:sh,withSyn});
+  };
+  const base=()=>({doms:[1,2,3,4,5],n:20,mode:modeNow(),shuffle:true,withSyn:document.getElementById('syn').checked});
+  app.querySelectorAll('.casebtn').forEach(b=>b.onclick=()=>{
+    const c=SYN.cases.find(x=>x.id===+b.dataset.case); startSession(c.qs.slice(),Object.assign(base(),{n:c.qs.length}));
+  });
+  app.querySelectorAll('.serbtn').forEach(b=>b.onclick=()=>{
+    const s=SYN.series.find(x=>x.id===+b.dataset.ser); startSession(s.qs.slice(),Object.assign(base(),{n:s.qs.length}));
+  });
+  document.getElementById('synonly').onclick=()=>{
+    const n=Math.min(SYN_COUNT,Math.max(1,parseInt(document.getElementById('synn').value)||20));
+    startSession(shuffle(SYN.normal).slice(0,n),Object.assign(base(),{n}));
+  };
+  document.getElementById('sim').onclick=()=>{
+    const on=document.getElementById('simsyn').checked;
+    let normal=[]; Object.keys(SIM_MIX).forEach(d=>{ normal=normal.concat(shuffle((on?SYN.normal:DATA).filter(q=>q.dom===+d)).slice(0,SIM_MIX[d])); });
+    if(!on){ startSession(shuffle(normal),Object.assign(base(),{mode:'exam',sim:true,withSyn:false,n:normal.length})); return; }
+    const ser=SYN.series[Math.floor(Math.random()*SYN.series.length)];
+    const cs=SYN.cases[Math.floor(Math.random()*SYN.cases.length)];
+    startSession(shuffle(normal).concat(ser.qs,cs.qs),Object.assign(base(),{mode:'exam',sim:true,withSyn:true,n:normal.length+ser.qs.length+cs.qs.length}));
+  };
+  upd(); simUpd();
+  window.scrollTo(0,0);
+}
+
+/* ---------- quiz ---------- */
+function startSession(qs,cfg){
+  if(S&&S.timer){clearInterval(S.timer);}
+  // ans[i] is the current pick for question i; checked[i] marks a Practice question whose answer was revealed.
+  S={qs,cfg,i:0,ans:[],checked:[],t0:Date.now(),timer:null,lastPct:0};
+  if(cfg.sim){ S.timer=setInterval(()=>{const c=document.getElementById('clock'); if(c) c.textContent=clockText();},1000); }
+  renderQ();
+  window.scrollTo(0,0);
+}
+function clockText(){ const s=Math.floor((Date.now()-S.t0)/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function openQ(i){ S.i=i; renderQ(); window.scrollTo(0,0); }
+function openReview(){ renderReview(); window.scrollTo(0,0); }
+function gradeQ(q,p){ return q.type==='slots' ? (p.length===q.slots.length && p.every((v,k)=>v===q.slots[k].correct)) : setEq(p,q.correct); }
+function isAnswered(q,p){ return !!p && (q.type==='slots' ? p.some(v=>v) : p.length>0); }
+function tagsFor(q){
+  let h='';
+  if(q.syn) h+='<span class="tag syn-badge">Synthetic</span>';
+  if(q.seriesId) h+='<span class="chip">Yes/No series</span>';
+  if(q.caseId) h+='<span class="chip">Case study</span>';
+  return h;
+}
+function contextPanel(q){
+  const prev=S.i>0?S.qs[S.i-1]:null;
+  if(q.caseId){
+    const c=SYN.cases.find(x=>x.id===q.caseId); const first=!prev||prev.caseId!==q.caseId;
+    return `<details class="panel syn" ${first?'open':''}><summary>Case study: ${esc(c.title)}</summary><div class="in">${md(c.text)}</div></details>`;
+  }
+  if(q.seriesId){
+    const s=SYN.series.find(x=>x.id===q.seriesId);
+    return `<details class="panel syn" open><summary>Yes/No series: ${esc(s.title)}</summary><div class="in">${md(s.text)}</div></details>`;
+  }
+  return '';
+}
+function renderQ(){
+  const i=S.i, q=S.qs[i]; const total=S.qs.length; const practice=S.cfg.mode==='practice';
+  const need=q.correct.length;
+  let optsHtml='';
+  if(q.type==='slots'){
+    optsHtml=boardHtml(q);
+  } else {
+    const kind=q.type==='multi'?'checkbox':'radio';
+    optsHtml=`<span class="instr">${q.type==='multi'?`Choose ${need}.`:'Choose one.'}</span><div class="opts" role="group">`+
+      q.opts.map(([L,t])=>`<label class="opt" id="o${L}" for="i${L}"><input type="${kind}" name="ans" id="i${L}" value="${L}"><span class="L">${L}</span><span class="T">${md(t)}</span><span class="mk" aria-hidden="true"></span></label>`).join('')+`</div>`;
+  }
+  const from=S.lastPct, to=(S.i/total)*100; S.lastPct=to;
+  app.innerHTML=`
+    <div class="narrow stage">
+    <div class="qhead meta"><div class="qcount">Question ${S.i+1}<span>of ${total}</span></div><div class="tags">${tagsFor(q)}<span class="chip">${DOMAINS[q.dom]}</span>${S.cfg.sim?`<span id="clock">${clockText()}</span>`:''}</div></div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${S.i}"><i id="prog" style="width:${REDUCE?to:from}%"></i></div>
+    ${contextPanel(q)}
+    <div class="qcard card ${q.syn?'synq':''}">
+      <div class="stem">${md(q.stem)}</div>${optsHtml}
+      <div id="hintBox"></div>
+      <div id="fb" aria-live="polite"></div>
+      <div class="actions" id="actions"></div>
+    </div>
+    <div class="quit"><button type="button" class="ghost" id="quit">End session</button></div>
+    </div>`;
+  if(!REDUCE) requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=document.getElementById('prog'); if(b) b.style.width=to+'%';}));
+  const actions=document.getElementById('actions');
+  const button=(id,label,cls,onclick)=>{ const b=document.createElement('button'); b.type='button'; b.id=id; b.textContent=label; b.className=cls; b.onclick=onclick; return b; };
+  const back=i>0?button('back','Back','',()=>openQ(i-1)):null;
+  const hintBtn=S.cfg.sim?null:button('hintBtn','Show hint','ghost',()=>{ document.getElementById('hintBox').innerHTML=`<div class="hint"><b>Hint:</b> ${inline(q.hint)}</div>`; hintBtn.disabled=true; });
+  const review=button('review','Review','ghost',openReview);
+  const check=practice?button('check','Check answer','primary',()=>{ S.checked[i]=true; reveal(); next.focus(); }):null;
+  const next=button('next','Next',practice?'':'primary',()=>{ if(i===total-1) openReview(); else openQ(i+1); });
+  // Every change is saved to S.ans at once, so Back, Next, Review and End session all keep the pick.
+  const changed=()=>{ if(check) check.disabled=!ready(); };
+  const board=q.type==='slots'?slotBoard(q,i,changed):null;
+  const fields=[...app.querySelectorAll('input[name=ans]')];
+  const read=()=>fields.filter(x=>x.checked).map(x=>x.value);
+  const paint=()=>app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked));
+  // Check answer waits for a pick; a slot question needs every slot filled.
+  const ready=()=>board? board.ready() : read().length>0;
+  // Locks a checked Practice question and shows the correct answer with its feedback.
+  const reveal=()=>{
+    const p=S.ans[i];
+    if(board) board.lock(p);
+    fields.forEach(x=>x.disabled=true);
+    app.querySelectorAll('.opt').forEach(o=>{
+      const L=o.querySelector('input').value; o.classList.add('locked');
+      if(q.correct.includes(L)) o.classList.add('right'); else if(p.includes(L)) o.classList.add('wrong');
+    });
+    document.getElementById('fb').innerHTML=feedback(q,gradeQ(q,p),p);
+    if(hintBtn) hintBtn.remove();
+    check.disabled=true; check.className=''; next.className='primary';
+  };
+  const saved=S.ans[i];
+  if(saved){ fields.forEach(x=>{ x.checked=saved.includes(x.value); }); paint(); }
+  fields.forEach(x=>x.addEventListener('change',()=>{ S.ans[i]=read(); paint(); changed(); }));
+  document.getElementById('quit').onclick=finish;
+  const spacer=document.createElement('span'); spacer.className='spacer';
+  actions.append(...[back,hintBtn,review,spacer,check,next].filter(Boolean));
+  if(check){ check.disabled=!ready(); if(S.checked[i]) reveal(); }
+}
+
+/* ---------- drag-and-drop for slot questions (ordering, matching, code blanks) ---------- */
+// One option pool per question: every choice of every slot, each usable once, in alphabetical order.
+function poolOf(q){ return [...new Set(q.slots.flatMap(s=>s.choices))].sort((a,b)=>a.localeCompare(b)); }
+function boardHtml(q){
+  return `<span class="instr">Drag an option into each slot, or select an option and then a slot.</span>
+    <div class="dnd" id="dnd">
+      <div class="pool" role="group" aria-label="Options">${poolOf(q).map((v,n)=>`<button type="button" class="piece" id="p${n}" data-n="${n}">${esc(v)}</button>`).join('')}</div>
+      <div class="targets" role="group" aria-label="Answer slots">${q.slots.map((s,k)=>`<div class="slot" data-k="${k}"><span class="sl">${esc(s.label)}</span><div class="slotrow"><button type="button" class="slotbtn" id="s${k}"></button><button type="button" class="unslot">✕</button><span class="slotmk" aria-hidden="true"></span></div></div>`).join('')}</div>
+    </div><div class="sr-only" id="live" aria-live="polite"></div>`;
+}
+// Wires the board for question i. The answer stays an array with one value per slot ('' when empty).
+function slotBoard(q,i,changed){
+  const board=document.getElementById('dnd'), live=document.getElementById('live');
+  const values=poolOf(q), pieces=[...board.querySelectorAll('.piece')], slots=[...board.querySelectorAll('.slot')];
+  const ans=()=>S.ans[i]||q.slots.map(()=>'');
+  const name=k=>q.slots[k].label;
+  const say=t=>{ live.textContent=t; };
+  let held=null, locked=false, dragged=false, grabbing=false; // held: the option picked up by click or keyboard, {v, from}
+  const paint=()=>{
+    const a=ans();
+    pieces.forEach((el,n)=>{
+      const v=values[n], at=a.indexOf(v), on=!!held&&held.from===null&&held.v===v;
+      el.classList.toggle('used',at>=0); el.classList.toggle('held',on);
+      el.disabled=locked||at>=0; el.setAttribute('aria-pressed',on);
+      el.setAttribute('aria-label',at>=0?`${v}, placed in ${name(at)}`:v);
+    });
+    slots.forEach((el,k)=>{
+      const v=a[k], on=!!held&&held.from===k, btn=el.querySelector('.slotbtn'), x=el.querySelector('.unslot');
+      el.classList.toggle('filled',!!v); el.classList.toggle('held',on);
+      btn.textContent=v||'Empty'; btn.disabled=locked; btn.setAttribute('aria-pressed',on);
+      btn.setAttribute('aria-label',`${name(k)}: ${v||'empty'}`);
+      x.hidden=locked||!v; x.setAttribute('aria-label',`Remove ${v} from ${name(k)}`);
+    });
+  };
+  // Puts v into slot `to`, or back in the pool. `from` is the slot it came from, null for the pool.
+  // A filled target swaps with the source slot; an option coming from the pool sends the old one back.
+  const move=(v,from,to)=>{
+    held=null;
+    if(to===null||to===from||(to==='pool'&&from===null)){ paint(); return; }
+    const a=ans().slice(); let msg;
+    if(to==='pool'){ a[from]=''; msg=`removed ${v} from ${name(from)}`; }
+    else {
+      const other=a[to]; a[to]=v; if(from!==null) a[from]=other;
+      msg=`placed ${v} in ${name(to)}`+(!other?'':from===null?`, ${other} returned to the pool`:`, moved ${other} to ${name(from)}`);
+    }
+    S.ans[i]=a; paint(); say(msg); changed();
+  };
+  const hold=(v,from)=>{
+    const same=!!held&&held.v===v&&held.from===from;
+    held=same?null:{v,from}; paint();
+    say(same?`${v} deselected`:`${v} selected. Choose a slot.`);
+  };
+  // Click, tap, Enter and Space: select an option, then a slot.
+  board.addEventListener('click',e=>{
+    if(locked||dragged) return;
+    const slot=e.target.closest('.slot'), piece=e.target.closest('.piece');
+    if(e.target.closest('.unslot')){ const k=+slot.dataset.k; move(ans()[k],k,'pool'); slot.querySelector('.slotbtn').focus(); }
+    else if(piece) hold(values[+piece.dataset.n],null);
+    else if(slot){
+      const k=+slot.dataset.k, v=ans()[k];
+      if(held&&held.from!==k) move(held.v,held.from,k);
+      else if(v) hold(v,k);
+      else say('Select an option first.');
+    }
+    else if(e.target.closest('.pool')&&held&&held.from!==null) move(held.v,held.from,'pool');
+  });
+  board.addEventListener('keydown',e=>{ if(e.key==='Escape'&&held){ held=null; paint(); say('selection cleared'); } });
+  // Dragging uses Pointer Events, so mouse, pen and touch behave the same.
+  board.addEventListener('pointerdown',e=>{
+    if(locked||e.button!==0||!e.isPrimary) return;
+    const piece=e.target.closest('.piece'), btn=e.target.closest('.slotbtn');
+    const from=btn?+btn.closest('.slot').dataset.k:null;
+    const v=btn?ans()[from]:(piece&&!piece.disabled?values[+piece.dataset.n]:'');
+    if(!v) return;
+    const src=piece||btn, box=src.getBoundingClientRect(), x0=e.clientX, y0=e.clientY, id=e.pointerId, width=Math.min(box.width,300);
+    let ghost=null, over=null;
+    const noSelect=ev=>ev.preventDefault();
+    const targetAt=ev=>{ const el=document.elementFromPoint(ev.clientX,ev.clientY); const t=el&&el.closest('.slot, .pool'); return t&&board.contains(t)?t:null; };
+    const mark=t=>{ if(over) over.classList.remove('over'); over=t; if(over) over.classList.add('over'); };
+    const drag=ev=>{
+      if(ev.pointerId!==id) return;
+      if(!ghost){
+        if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<6) return; // still a tap
+        held=null; paint();
+        ghost=document.createElement('div'); ghost.className='ghost-drag'; ghost.setAttribute('aria-hidden','true'); ghost.textContent=v;
+        ghost.style.width=width+'px'; document.body.append(ghost); src.classList.add('lifted');
+      }
+      ghost.style.left=(ev.clientX-Math.min(x0-box.left,width-24))+'px'; ghost.style.top=(ev.clientY-(y0-box.top))+'px';
+      mark(targetAt(ev));
+    };
+    const end=ev=>{
+      if(ev.pointerId!==id) return;
+      grabbing=false;
+      document.removeEventListener('selectstart',noSelect);
+      document.removeEventListener('pointermove',drag); document.removeEventListener('pointerup',end); document.removeEventListener('pointercancel',end);
+      if(!ghost) return; // a plain tap: the click handler takes it
+      ghost.remove(); src.classList.remove('lifted'); mark(null);
+      dragged=true; setTimeout(()=>{ dragged=false; },0); // ignore the click a mouse drag can end with
+      if(ev.type==='pointercancel') return;
+      const t=targetAt(ev);
+      move(v,from,!t?null:t.classList.contains('pool')?'pool':+t.dataset.k);
+    };
+    grabbing=true;
+    document.addEventListener('selectstart',noSelect); // a mouse drag must not highlight the page
+    document.addEventListener('pointermove',drag); document.addEventListener('pointerup',end); document.addEventListener('pointercancel',end);
+  });
+  // Claiming the touch keeps the page still and stops the browser swallowing the tap that follows a quick drag.
+  board.addEventListener('touchmove',e=>{ if(grabbing) e.preventDefault(); },{passive:false});
+  paint();
+  return {
+    ready:()=>ans().every(v=>v),
+    // After Check answer: freeze the board, mark each slot and show the right value for wrong ones.
+    lock(p){
+      locked=true; held=null; paint(); board.classList.add('locked');
+      slots.forEach((el,k)=>{
+        const want=q.slots[k].correct, good=p[k]===want;
+        el.classList.add(good?'right':'wrong'); el.querySelector('.slotmk').textContent=good?'✓':'✕';
+        el.querySelector('.slotbtn').setAttribute('aria-label',`${name(k)}: ${p[k]}, ${good?'correct':'incorrect. Correct answer: '+want}`);
+        if(!good) el.insertAdjacentHTML('beforeend',`<div class="fix">Correct answer: <b>${esc(want)}</b></div>`);
+      });
+    }
+  };
+}
+
+/* ---------- review screen ---------- */
+const STATES={answered:{mark:'●',name:'Answered',label:'answered'},unanswered:{mark:'–',name:'Not answered',label:'not answered'},correct:{mark:'✓',name:'Checked, correct',label:'checked, correct'},incorrect:{mark:'✕',name:'Checked, incorrect',label:'checked, incorrect'}};
+function stateOf(i){
+  if(S.checked[i]) return gradeQ(S.qs[i],S.ans[i])?'correct':'incorrect';
+  return isAnswered(S.qs[i],S.ans[i])?'answered':'unanswered';
+}
+function renderReview(){
+  const states=S.qs.map((q,i)=>stateOf(i)); const left=states.filter(s=>s==='unanswered').length;
+  const keys=S.cfg.mode==='practice'?['answered','unanswered','correct','incorrect']:['answered','unanswered'];
+  app.innerHTML=`
+    <div class="narrow stage">
+    <div class="qhead"><h1>Review</h1>${S.cfg.sim?`<span id="clock">${clockText()}</span>`:''}</div>
+    <div class="panel-card" style="margin-top:18px">
+      <p id="counts"><b>${states.length-left}</b> answered · <b>${left}</b> not answered</p>
+      <ul class="legend" aria-label="Legend">${keys.map(k=>`<li><span class="key ${k}" aria-hidden="true">${STATES[k].mark}</span>${STATES[k].name}</li>`).join('')}<li><span class="key now" aria-hidden="true">${S.i+1}</span>Current</li></ul>
+      <div class="qgrid" role="group" aria-label="Questions">${states.map((s,i)=>{const now=i===S.i; return `<button type="button" class="${s}${now?' now':''}" data-i="${i}" aria-label="Question ${i+1}, ${STATES[s].label}${now?', current':''}"${now?' aria-current="step"':''}><span class="no">${i+1}</span><span aria-hidden="true">${STATES[s].mark}</span></button>`;}).join('')}</div>
+      <div class="actions">
+        <button type="button" id="resume">Back to question ${S.i+1}</button><span class="spacer"></span>
+        <div class="actions">${left?`<span class="small" id="left">${left} not answered</span>`:''}<button type="button" class="primary" id="finish">Finish and see results</button></div>
+      </div>
+    </div>
+    <div class="quit"><button type="button" class="ghost" id="quit">End session</button></div>
+    </div>`;
+  app.querySelectorAll('.qgrid button').forEach(b=>b.onclick=()=>openQ(+b.dataset.i));
+  document.getElementById('resume').onclick=()=>openQ(S.i);
+  document.getElementById('finish').onclick=finish;
+  document.getElementById('quit').onclick=finish;
+}
+function slotRows(q,p){
+  return `<ul class="slotres">`+q.slots.map((s,k)=>{
+    const good=p[k]===s.correct;
+    return `<li><b>${esc(s.label)}</b>: ${good?`<span class="pill-good">${esc(s.correct)}</span>`:`<span class="pill-bad">${esc(p[k]||'no answer')}</span>, correct: <b>${esc(s.correct)}</b>`}</li>`;
+  }).join('')+`</ul>`;
+}
+// "Read on Microsoft Learn" links, shown only once the answer is revealed.
+function sourceLinks(q){
+  if(!q.sources||!q.sources.length) return '';
+  return `<div class="sources"><b>Read on Microsoft Learn</b><ul>${q.sources.map(s=>`<li><a href="${esc(s.url).replace(/"/g,'&quot;')}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></div>`;
+}
+function feedback(q,ok,p){
+  const ans = q.type==='slots' ? slotRows(q,p) : `Correct answer: <b>${esc(q.correct.join(', '))}</b>`;
+  return `<div class="feedback ${ok?'ok':'no'}"><div class="verdict ${ok?'ok':'no'}">${ok?'Correct':'Not quite'}</div><p>${ans}</p>
+    ${q.rationale?`<p>${inline(q.rationale.replace(/\n+/g,' '))}</p>`:''}
+    ${q.note?`<p class="note">${inline(q.note)}</p>`:''}${sourceLinks(q)}</div>`;
+}
+/* ---------- results ---------- */
+function fmtTime(ms){ const s=Math.floor(ms/1000); return Math.floor(s/60)+' min '+String(s%60).padStart(2,'0')+' s'; }
+function finish(){
+  if(S.timer){clearInterval(S.timer);S.timer=null;}
+  const r=S.qs.map((q,i)=>{
+    const answered=isAnswered(q,S.ans[i]);
+    const picked=answered? S.ans[i] : (q.type==='slots'? q.slots.map(()=>'') : []);
+    return {q,picked,ok:answered&&gradeQ(q,picked),answered};
+  });
+  // Every mode scores answered questions only, whether or not a Practice answer was checked.
+  const done=r.filter(x=>x.answered), skipped=r.filter(x=>!x.answered);
+  const correct=done.filter(x=>x.ok), missed=done.filter(x=>!x.ok);
+  const n=done.length; const right=correct.length;
+  const pct=n?Math.round(right/n*100):0;
+  const full=Math.round(right/r.length*100);
+  const by={}; done.forEach(x=>{const d=x.q.dom; by[d]=by[d]||{n:0,r:0}; by[d].n++; if(x.ok) by[d].r++;});
+  const syn=done.filter(x=>x.q.syn), org=done.filter(x=>!x.q.syn);
+  const group=(title,items,status,open)=>`<h2 class="section-title">${title}</h2>${items.map((x,k)=>reviewItem(x,status,open(k))).join('')||'<p class="small">None.</p>'}`;
+  const shut=()=>false;
+  const review=group(`Answered incorrectly (${missed.length})`,missed,'incorrect',k=>k===0)
+    +group(`Not answered (${skipped.length})`,skipped,'unanswered',shut)
+    +group(`Answered correctly (${right})`,correct,'correct',shut);
+  const split=(syn.length&&org.length)?`<p class="small">Original: ${org.filter(x=>x.ok).length}/${org.length} · <span class="tag syn-badge">Synthetic</span> ${syn.filter(x=>x.ok).length}/${syn.length}</p>`:'';
+  const C=2*Math.PI*62;
+  app.innerHTML=`
+    <div class="narrow stage">
+    <h1>Results</h1>
+    <div class="panel-card card" style="margin-top:18px">
+      <div class="res-top">
+        <div class="ring" role="img" aria-label="${n?pct+' percent correct':'No questions answered'}"><svg width="150" height="150" viewBox="0 0 150 150"><circle class="trk" cx="75" cy="75" r="62" fill="none" stroke-width="12"/><circle class="val" id="ringv" cx="75" cy="75" r="62" fill="none" stroke-width="12" stroke-dasharray="${C}" stroke-dashoffset="${REDUCE?C*(1-pct/100):C}" ${n?'':'visibility="hidden"'}/></svg><div class="num" id="ringn">${n?(REDUCE?pct:0)+'%':'–'}</div></div>
+        <div>
+          <p class="big score">${right} / ${n} <span class="small">${n?`answered correctly (${pct}%)`:'(no questions answered)'}</span></p>
+          ${S.cfg.sim?`<p class="small"><b>Full-exam estimate:</b> ${right} / ${r.length} (${full}%), with unanswered questions counted as wrong.</p>
+          <p class="small">Time: ${fmtTime(Date.now()-S.t0)}. The real exam is scored out of 1000 with 700 to pass, so treat these percentages as a rough guide only.</p>`:''}
+          ${split}
+          ${skipped.length?`<p class="small">${skipped.length} question${skipped.length>1?'s were':' was'} not answered and ${skipped.length>1?'are':'is'} not in the score above.</p>`:''}
+        </div>
+      </div>
+      <h2 class="section-title">By domain</h2>
+      ${Object.keys(by).sort().map(d=>{const v=by[d],p=Math.round(v.r/v.n*100); return `<div class="dom"><span class="nm">${DOMAINS[d]}</span><span class="vl">${v.n} answered · ${v.r} correct (${p}%)</span><div class="bar"><i class="${p<60?'low':''}" data-w="${p}" style="width:${REDUCE?p:0}%"></i></div></div>`;}).join('')||'<p class="small">No questions answered.</p>'}
+    </div>
+    <div class="row" style="margin:18px 0 6px">
+      <button class="primary" id="retry" ${missed.length?'':'disabled'}>Retry the ${missed.length} incorrect</button>
+      <button id="again">Back to setup</button>
+    </div>
+    ${review}
+    </div>`;
+  document.getElementById('again').onclick=()=>showSetup(S.cfg);
+  document.getElementById('retry').onclick=()=>{ const qs=shuffle(missed.map(x=>x.q)); startSession(qs,Object.assign({},S.cfg,{n:qs.length,sim:false,mode:S.cfg.sim?'practice':S.cfg.mode})); };
+  window.scrollTo(0,0);
+  if(!REDUCE){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      document.getElementById('ringv').style.strokeDashoffset=C*(1-pct/100);
+      app.querySelectorAll('.dom .bar i').forEach(b=>b.style.width=b.dataset.w+'%');
+      const el=document.getElementById('ringn'); const t0=performance.now();
+      const step=t=>{ const k=Math.min(1,(t-t0)/900); el.textContent=Math.round(pct*(1-Math.pow(1-k,3)))+'%'; if(k<1) requestAnimationFrame(step); };
+      if(n) requestAnimationFrame(step);
+    }));
+  }
+}
+function reviewItem(x,status,open){
+  const first=esc(x.q.stem.replace(/\*\*/g,'').split('\n')[0].slice(0,110))+(x.q.stem.length>110?'…':'');
+  const pill={correct:'<span class="pill-good">Correct</span>',incorrect:'<span class="pill-bad">Incorrect</span>',unanswered:'<span class="chip">Not answered</span>'}[status];
+  return `<details class="rev" data-status="${status}" ${open?'open':''}><summary>${pill}${x.q.syn?'<span class="tag syn-badge">Synthetic</span>':''}<span class="chip">${DOMAINS[x.q.dom]}</span><span class="sumtxt">${first}</span></summary><div class="in">${reviewBody(x)}</div></details>`;
+}
+function reviewBody(x){
+  const q=x.q; let h='';
+  if(q.caseId){ const c=SYN.cases.find(y=>y.id===q.caseId); h+=`<p class="small">Case study: ${esc(c.title)}</p>`; }
+  if(q.seriesId){ const s=SYN.series.find(y=>y.id===q.seriesId); h+=`<div class="stem">${md(s.text.split('\n\nFor each')[0])}</div>`; }
+  h+=`<div class="stem">${md(q.stem)}</div>`;
+  if(q.type==='slots'){
+    h+=slotRows(q,x.picked);
+  } else {
+    h+=`<div class="opts rv">`+q.opts.map(([L,t])=>{
+      const c=q.correct.includes(L), p=x.picked.includes(L);
+      const cls=c?'right':(p?'wrong':'');
+      return `<div class="opt locked ${cls}"><span class="L">${L}</span><span class="T">${md(t)}${p?'<div class="note">Your pick</div>':''}</span><span class="mk" aria-hidden="true"></span></div>`;
+    }).join('')+`</div>`;
+  }
+  if(q.rationale) h+=`<p><b>Why:</b> ${inline(q.rationale.replace(/\n+/g,' '))}</p>`;
+  h+=`<div class="hint"><b>Concept:</b> ${inline(q.hint)}</div>`;
+  if(q.note) h+=`<p class="note">${inline(q.note)}</p>`;
+  return h+sourceLinks(q);
+}
+/* ---------- theme (chosen by the user, default light) ---------- */
+const ICON_MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const ICON_SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function applyTheme(th){
+  document.documentElement.setAttribute('data-theme',th);
+  const b=document.getElementById('theme'); b.setAttribute('aria-pressed',th==='dark'?'true':'false');
+  b.innerHTML=th==='dark'?ICON_SUN+'<span>Light mode</span>':ICON_MOON+'<span>Dark mode</span>';
+}
+let theme='light';
+try{ const s=localStorage.getItem('ai300-theme'); if(s==='dark'||s==='light') theme=s; }catch(e){}
+applyTheme(theme);
+document.getElementById('theme').onclick=()=>{
+  theme=theme==='dark'?'light':'dark'; applyTheme(theme);
+  try{ localStorage.setItem('ai300-theme',theme); }catch(e){}
+};
+showSetup();
+</script>
+</body>
+</html>
