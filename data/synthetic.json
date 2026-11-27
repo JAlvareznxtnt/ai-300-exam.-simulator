@@ -417,10 +417,16 @@
    "correct": [
     "D"
    ],
-   "rationale": "Outside Azure Machine Learning compute, MLflow does not know where the workspace is, so you point it at the workspace's tracking URI. autolog turns on automatic logging but does not change where runs are stored.",
+   "rationale": "Outside Azure Machine Learning compute, MLflow does not know where the workspace is, so you point it at the workspace's tracking URI.",
    "hint": "MLflow from outside Azure ML = set the tracking URI to the workspace.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Configure MLflow for Azure Machine Learning",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-use-mlflow-configure-tracking?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3012,
@@ -451,7 +457,13 @@
    "rationale": "With a very small positive class, accuracy looks excellent even for a model that predicts no fraud at all. AUC_weighted still reflects how well the classes are separated. The other two are regression metrics.",
    "hint": "Imbalanced classes: avoid accuracy, use AUC_weighted or similar.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Set up AutoML training for tabular data with the Azure Machine Learning CLI and Python SDK",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-configure-auto-train?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3013,
@@ -482,7 +494,13 @@
    "rationale": "Random sampling supports discrete and continuous search spaces. Grid supports only Choice, and Bayesian supports only Choice, Uniform and QUniform. Median stopping is an early termination policy, not a sampling algorithm.",
    "hint": "Normal/LogUniform (continuous) = random. Grid = Choice only.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Hyperparameter tuning a model (v2)",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3014,
@@ -526,7 +544,13 @@
    "rationale": "Bandit compares each trial with the best one using slack_factor or slack_amount. Median stopping compares with the median of running averages. Truncation selection drops a percentage (truncation_percentage) of the worst trials at each interval. Sobol is a sampling option, not a policy.",
    "hint": "Bandit = slack from best. Median = vs median. Truncation = bottom percent.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Hyperparameter tuning a model (v2)",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3015,
@@ -557,7 +581,13 @@
    "rationale": "max_total_trials caps the number of trials, max_concurrent_trials caps how many run in parallel, and timeout is in seconds for the whole sweep, so one hour is 3600. The other calls swap the two limits, use 60 seconds, or let all 20 trials run at once.",
    "hint": "total = how many, concurrent = at once, timeout = seconds for the whole sweep.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Hyperparameter tuning a model (v2)",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3016,
@@ -588,7 +618,13 @@
    "rationale": "instance_count sets the number of nodes (2), and process_count_per_instance sets how many processes run on each node, usually one per GPU (4). The other settings give the wrong number of nodes or leave GPUs unused.",
    "hint": "Nodes = instance_count. Processes per node = process_count_per_instance (one per GPU).",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Distributed GPU training guide (SDK v2)",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-train-distributed-gpu?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3017,
@@ -616,10 +652,16 @@
    "correct": [
     "A"
    ],
-   "rationale": "Pipelines reuse the output of a previous run when a component and its inputs are unchanged, because components are deterministic by default. A step that reads changing external data must declare is_deterministic false so it always runs. Cluster size, job names and sweeps do not affect reuse.",
+   "rationale": "Pipelines can reuse the output of a previous run when a deterministic component and its inputs are unchanged. A step that reads changing external data must declare is_deterministic false so it always runs.",
    "hint": "Step reads changing external data = is_deterministic false.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Debug pipeline reuse issues in Azure Machine Learning",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-debug-pipeline-reuse-issues?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3018,
@@ -650,7 +692,13 @@
    "rationale": "MLflow models support no-code deployment, so Azure Machine Learning generates the scoring logic and environment from the model metadata. The other choices add work that is not needed.",
    "hint": "MLflow model = no-code deployment, no score.py.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Guidelines for deploying MLflow models",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-deploy-mlflow-models?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3019,
@@ -678,10 +726,16 @@
    "correct": [
     "B"
    ],
-   "rationale": "Archiving hides the version from the default listings while it remains in the workspace, so lineage is kept and the version can be restored. Deleting artifacts or their storage destroys what you wanted to keep.",
+   "rationale": "Archiving hides the version from the default listings while it remains in the workspace, so lineage is kept and the version can still be referenced. Deleting artifacts or their storage destroys what you wanted to keep.",
    "hint": "Retire but keep lineage = archive.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Work with registered models in Azure Machine Learning",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-manage-models?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3020,
@@ -709,10 +763,20 @@
    "correct": [
     "B"
    ],
-   "rationale": "The fairness assessment compares model performance and outcomes, such as accuracy and selection rate, across groups defined by sensitive features. Counterfactuals and the data explorer do not compare group metrics. The model overview shows overall performance unless a sensitive feature is defined.",
+   "rationale": "The fairness assessment compares model performance and outcomes, such as accuracy and selection rate, across groups defined by sensitive features. Counterfactual what-if looks at how changing features affects predictions. The model overview shows overall performance unless a sensitive feature is defined.",
    "hint": "Compare outcomes across groups = fairness assessment.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Assess AI systems by using the Responsible AI dashboard",
+     "url": "https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai-dashboard?view=azureml-api-2"
+    },
+    {
+     "title": "Model performance and fairness",
+     "url": "https://learn.microsoft.com/azure/machine-learning/concept-fairness-ml?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3021,
@@ -740,10 +804,16 @@
    "correct": [
     "C"
    ],
-   "rationale": "The traffic split is a property of the endpoint, so setting blue to 100% immediately stops sending requests to green. Deleting the endpoint or redeploying causes downtime or delay, and scaling green to zero would make its 20% of requests fail.",
+   "rationale": "The traffic split is a property of the endpoint, so setting blue to 100% immediately stops sending requests to green.",
    "hint": "Rollback = move traffic back to the old deployment.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Perform safe rollout of new deployments for real-time inference",
+     "url": "https://learn.microsoft.com/azure/machine-learning/how-to-safely-rollout-online-endpoints?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3022,
@@ -771,10 +841,20 @@
    "correct": [
     "A"
    ],
-   "rationale": "Batch endpoints are built for asynchronous scoring of large datasets with outputs written to storage. Online endpoints serve low-latency requests one at a time and cost more for bulk work.",
+   "rationale": "Batch endpoints are built for asynchronous scoring of large datasets with outputs written to storage. Online endpoints are for real-time, low-latency requests.",
    "hint": "Big asynchronous scoring = batch endpoint. Per-request low latency = online endpoint.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Batch endpoints",
+     "url": "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-batch?view=azureml-api-2"
+    },
+    {
+     "title": "Online endpoint deployment for real-time inferencing",
+     "url": "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-online?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3023,
@@ -802,10 +882,16 @@
    "correct": [
     "D"
    ],
-   "rationale": "Model monitoring computes signals from production inference data, so the deployment must collect it. A high threshold changes alerts, not whether data exists. The reference dataset and feature attribution drift affect other things.",
+   "rationale": "Model monitoring computes signals from production inference data, so the deployment must collect it.",
    "hint": "No data in the monitor = turn on inference data collection.",
    "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "syn": true,
+   "sources": [
+    {
+     "title": "Azure Machine Learning model monitoring",
+     "url": "https://learn.microsoft.com/azure/machine-learning/concept-model-monitoring?view=azureml-api-2"
+    }
+   ]
   },
   {
    "n": 3024,
@@ -833,10 +919,16 @@
    "correct": [
     "A"
    ],
-   "rationale": "PyTorch adds new gradients to the old ones, so without zero_grad each update uses the sum of all earlier batches. Changing the optimizer does not fix that, no_grad would stop gradients from being computed, and step must come after backward.",
+   "rationale": "PyTorch adds new gradients to the old ones, so without zero_grad each update uses the sum of all earlier batches. In the training loop, optimizer.step() comes after loss.backward().",
    "hint": "PyTorch loop order: zero_grad, forward, backward, step.",
-   "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
-   "syn": true
+   "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam. Docs don't confirm: the cited tutorial shows zero_grad() before backward() and step(), but does not state that gradients accumulate without it.",
+   "syn": true,
+   "sources": [
+    {
+     "title": "Train your data analysis model with PyTorch",
+     "url": "https://learn.microsoft.com/windows/ai/windows-ml/tutorials/pytorch-analysis-train-model"
+    }
+   ]
   },
   {
    "n": 3025,
@@ -1889,7 +1981,13 @@
      "hint": "Random sampling + an early termination policy.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "seriesId": 2
+     "seriesId": 2,
+     "sources": [
+      {
+       "title": "Hyperparameter tuning a model (v2)",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2"
+      }
+     ]
     },
     {
      "n": 3055,
@@ -1913,7 +2011,13 @@
      "hint": "Grid = Choice only, so it cannot explore a continuous range.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "seriesId": 2
+     "seriesId": 2,
+     "sources": [
+      {
+       "title": "Hyperparameter tuning a model (v2)",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2"
+      }
+     ]
     },
     {
      "n": 3056,
@@ -1937,7 +2041,13 @@
      "hint": "Parallelism is not early termination.",
      "note": "Synthetic question written by Claude from the official skills outline and the docs. It is not from the real exam.",
      "syn": true,
-     "seriesId": 2
+     "seriesId": 2,
+     "sources": [
+      {
+       "title": "Hyperparameter tuning a model (v2)",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-tune-hyperparameters?view=azureml-api-2"
+      }
+     ]
     }
    ]
   }
@@ -2164,11 +2274,25 @@
      "correct": [
       "B"
      ],
-     "rationale": "Mirrored traffic copies a share of live requests to green while the response always comes from the deployment that holds the live traffic, so customers never see green's output. A traffic split sends real responses to customers from green. A batch endpoint does not use live production requests.",
+     "rationale": "Mirrored traffic copies a share of live requests to green while the response always comes from the deployment that holds the live traffic, so customers never see green's output. A traffic split sends real responses to customers from green. A batch endpoint runs asynchronously over stored data.",
      "hint": "Test on live requests with no customer impact = mirror_traffic. Real customers on the new version = traffic split.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 2,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Perform safe rollout of new deployments for real-time inference",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-safely-rollout-online-endpoints?view=azureml-api-2"
+      },
+      {
+       "title": "ManagedOnlineEndpoint Class",
+       "url": "https://learn.microsoft.com/python/api/azure-ai-ml/azure.ai.ml.entities.managedonlineendpoint?view=azure-python"
+      },
+      {
+       "title": "Batch endpoints",
+       "url": "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-batch?view=azureml-api-2"
+      }
+     ]
     },
     {
      "n": 2002,
@@ -2203,7 +2327,21 @@
      "hint": "429 = too many requests, add instances. 504 = request too slow, raise request_timeout_ms.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 2,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Troubleshoot online endpoint deployment and scoring",
+       "url": "https://learn.microsoft.com/azure/machine-learning/how-to-troubleshoot-online-endpoints?view=azureml-api-2"
+      },
+      {
+       "title": "CLI (v2) managed online deployment YAML schema",
+       "url": "https://learn.microsoft.com/azure/machine-learning/reference-yaml-deployment-managed-online?view=azureml-api-2"
+      },
+      {
+       "title": "Batch endpoints",
+       "url": "https://learn.microsoft.com/azure/machine-learning/concept-endpoints-batch?view=azureml-api-2"
+      }
+     ]
     },
     {
      "n": 2003,
@@ -2273,7 +2411,13 @@
      "hint": "Inputs changed vs training = data drift. Needs actual outcomes = model performance.",
      "note": "Synthetic question written by Claude from the bank's topics. It is not from the real exam, so treat the answer as our reasoning.",
      "caseId": 2,
-     "syn": true
+     "syn": true,
+     "sources": [
+      {
+       "title": "Azure Machine Learning model monitoring",
+       "url": "https://learn.microsoft.com/azure/machine-learning/concept-model-monitoring?view=azureml-api-2"
+      }
+     ]
     },
     {
      "n": 2005,
