@@ -2,6 +2,8 @@
 
 **Resume from:** nothing left: every question in the Worth verifying list is done.
 
+**Totals (151 questions):** 126 verified, 9 not (5 docs don't confirm, 3 docs contradict, 1 docs conflict), 16 skipped. No synthetic option or key was changed in the final pass.
+
 ## Worth verifying
 
 Checked in this order. All remaining synthetic questions are included.
