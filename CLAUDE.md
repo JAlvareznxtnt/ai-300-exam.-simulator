@@ -5,7 +5,7 @@ Single-page AI-300 practice app. No backend, no accounts, nothing is persisted (
 ## Commands
 - On Windows the Python command is `python`, not `python3`. If `python` opens the Microsoft Store message, put `%LOCALAPPDATA%\Python\bin` ahead of `WindowsApps` on PATH. `npm test` and `npm run build` call `python3`, which that folder also provides.
 - `python3 scripts/build.py` builds `dist/index.html` (add `--root` to also write `./index.html`).
-- `python3 scripts/validate.py` checks `data/synthetic.json` (keys, duplicates, answer-position balance). Run it after any synthetic edit.
+- `python3 scripts/validate.py` checks `data/synthetic.json` (keys, duplicates, answer-position balance) and source URLs in both data files. Run it after any data edit. It exits with an error only for a source URL off learn.microsoft.com; a synthetic question without sources is a warning.
 - `npm test` builds, then runs the Playwright flow test (`tests/flow.test.js`). The first time: `npm install && npx playwright install chromium`.
 - The flow test takes a few minutes. Run it once at the end of a task, not after every edit.
 
@@ -23,7 +23,7 @@ Single-page AI-300 practice app. No backend, no accounts, nothing is persisted (
 
 ## Keep these stable (the flow test depends on them)
 Element ids: `#start #sim #simsyn #syn #synn #synonly #syndrop #domdrop #domsum #avail #cnt1..#cnt5 #n #m1 #m2 #sh #check #next #back #review #hintBtn #hintBox #quit #clock #resume #finish #counts #left #retry #again #ringn #theme`, plus `#iA..` (options) and, on slot questions, `#dnd #live`, `#p0..` (pool options, alphabetical) and `#s0..` (slot buttons).
-Classes and attributes: `.score`, `.meta`, `.syn-badge`, `.serbtn[data-ser]`, `.casebtn[data-case]`, `input[name=ans]`, `.qcount`, `.card`, `.feedback`, `.verdict`, `.opt.right`, `.opt.wrong`, `.stem`, `.hint`, `.pool`, `.targets`, `.piece`, `.slot[data-k]` (with `.filled`, `.held`, `.over`, `.right`, `.wrong`), `.slotbtn`, `.unslot`, `.slotmk`, `.fix`, `.ghost-drag`, `.lifted`, `.slotres`, `.pill-bad`, `.qgrid button[data-i]` (with its `aria-label`; the last child is the state mark), `.legend li`, `.res-top`, `.section-title`, `.dom .vl`, `details.rev[data-status]`.
+Classes and attributes: `.score`, `.meta`, `.syn-badge`, `.serbtn[data-ser]`, `.casebtn[data-case]`, `input[name=ans]`, `.qcount`, `.card`, `.feedback`, `.verdict`, `.opt.right`, `.opt.wrong`, `.stem`, `.hint`, `.pool`, `.targets`, `.piece`, `.slot[data-k]` (with `.filled`, `.held`, `.over`, `.right`, `.wrong`), `.slotbtn`, `.unslot`, `.slotmk`, `.fix`, `.ghost-drag`, `.lifted`, `.slotres`, `.pill-bad`, `.qgrid button[data-i]` (with its `aria-label`; the last child is the state mark), `.legend li`, `.sources`, `.res-top`, `.section-title`, `.dom .vl`, `details.rev[data-status]`.
 If you must rename one, update `tests/flow.test.js` in the same change.
 
 ## Behaviour rules
@@ -34,6 +34,7 @@ If you must rename one, update `tests/flow.test.js` in the same change.
 - Exam mode and the simulation have Back, Next and Review, never Check answer. Exam mode outside the simulation keeps the hint.
 - Review (every mode) opens a grid of numbered buttons (answered, not answered, current; in Practice also checked correct or incorrect). Each state has a mark and an `aria-label`, not only a color. Next on the last question opens it. The clock keeps running there. Finishing happens from this screen (`#finish`) or with End session from anywhere.
 - All modes score the same way: results split into Answered correctly, Answered incorrectly and Not answered, checked or not; the headline score is correct out of answered, and domain bars count answered questions only. A partly filled slot question counts as answered. Simulation runs also show a "Full-exam estimate" with unanswered questions counted as wrong. Review order is Incorrect (only the first item open), Not answered, Correct. Retry covers the incorrect ones.
+- A question with `sources` shows "Read on Microsoft Learn" links (new tab, `rel="noopener"`) after Check answer and in the results review. Never before the answer is revealed, and not on the question grid.
 - Respect `prefers-reduced-motion`. Motion answers a user action (question change, answer reveal, results ring and bars); no decorative loops.
 - Check the UI at 420 px wide: no horizontal scroll.
 
@@ -43,6 +44,7 @@ If you must rename one, update `tests/flow.test.js` in the same change.
 - A series or case question needs `seriesId` or `caseId` matching an entry in `series[]` or `cases[]`.
 - Keep the correct answer's position and length varied. `validate.py` flags imbalance.
 - Technical claims must match current Microsoft documentation. If a claim can't be verified, say so in the question's `note` field instead of stating it as fact.
+- `sources` (optional) is `[{title, url}]`, learn.microsoft.com only: the pages that support the question. `docs/verification.md` records each check. A bank question's options and key are never changed to match the docs; put the finding in its note.
 
 ## Working style
 - Small, scoped changes. Show the diff before committing. Never push without being asked.

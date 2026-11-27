@@ -310,6 +310,38 @@ const URL = require('url').pathToFileURL(path.join(__dirname, '..', 'dist', 'ind
   await p.goto(URL); await p.fill('#n','5'); await p.check('#m1'); await p.click('#start'); await p.click('#quit');
   await checkResults(5,0,false);
   console.log('early-end results ok');
+  // "Read on Microsoft Learn" links: after Check answer and in the results review, never before
+  const open=mode=>p.evaluate(mode=>{ const withS=DATA.find(q=>q.type==='mc'&&q.sources), plain=Object.assign({},withS,{n:-1,sources:undefined});
+    startSession([withS,plain],{doms:[1,2,3,4,5],n:2,mode,shuffle:false,withSyn:false}); return withS.sources.map(s=>s.url); },mode);
+  const links=sel=>p.$$eval(sel,e=>e.map(a=>({url:a.getAttribute('href'),target:a.target,rel:a.rel})));
+  await p.goto(URL); const want=(await open('practice')).map(url=>({url,target:'_blank',rel:'noopener'}));
+  assert.ok(want.length&&want.every(l=>l.url.startsWith('https://learn.microsoft.com/')));
+  assert.strictEqual(await count('.sources'),0,'no links before checking');
+  await answer(true); await p.click('#check');
+  assert.deepStrictEqual(await links('.feedback .sources a'),want); assert.strictEqual(await p.textContent('.sources b'),'Read on Microsoft Learn');
+  assert.strictEqual(await wide(),false,'long link titles wrap');
+  await p.click('#next'); await answer(true); await p.click('#check'); assert.strictEqual(await count('.sources'),0,'no block without sources');
+  await p.click('#review'); assert.strictEqual(await count('.sources'),0,'the question grid shows no links');
+  await p.click('#finish'); await p.$$eval('details.rev',e=>e.forEach(d=>d.open=true));
+  assert.deepStrictEqual(await links('details.rev .sources a'),want); assert.strictEqual(await count('details.rev .sources'),1); assert.strictEqual(await wide(),false);
+  await p.goto(URL); await open('exam'); await answer(true); assert.strictEqual(await count('.sources'),0,'no links during an exam');
+  await p.click('#next'); assert.strictEqual(await count('.sources'),0); await p.click('#next'); await p.click('#finish');
+  assert.strictEqual(await count('details.rev .sources'),1);
+  console.log('source links ok');
+  // validate.py: a synthetic question without sources only warns; a URL off learn.microsoft.com fails
+  const fs=require('fs'), cp=require('child_process');
+  const tmp=fs.mkdtempSync(path.join(require('os').tmpdir(),'ai300-'));
+  for(const f of ['scripts/validate.py','data/synthetic.json','data/questions.json']){ fs.mkdirSync(path.join(tmp,path.dirname(f)),{recursive:true}); fs.copyFileSync(path.join(__dirname,'..',f),path.join(tmp,f)); }
+  const check=(file,change)=>{ const to=path.join(tmp,'data',file), original=fs.readFileSync(to,'utf8'), d=JSON.parse(original); change(d); fs.writeFileSync(to,JSON.stringify(d));
+    const r=cp.spawnSync('python3',[path.join(tmp,'scripts','validate.py')],{encoding:'utf8'}); fs.writeFileSync(to,original); return r; };
+  let v=check('synthetic.json',d=>{ delete d.normal[0].sources; });
+  assert.strictEqual(v.status,0,v.stderr); assert.match(v.stdout,/warning: \d+ synthetic questions have no sources: [\d, ]*\b3001\b/);
+  for(const url of ['https://learn.microsoft.com.example.com/a','http://learn.microsoft.com/a','https://docs.github.com/a']){
+    v=check('synthetic.json',d=>{ d.normal[0].sources=[{title:'x',url}]; }); assert.strictEqual(v.status,1,url); assert.match(v.stdout,/FAILED/);
+  }
+  v=check('questions.json',d=>{ d[0].sources=[{title:'x',url:'https://example.com/'}]; }); assert.strictEqual(v.status,1,'bank sources are checked too');
+  fs.rmSync(tmp,{recursive:true,force:true});
+  console.log('validator ok');
   // dropdown checks
   await p.goto(URL);
   console.log('domains open?',await p.evaluate(()=>document.getElementById('domdrop').open),'| summary:',(await p.textContent('#domsum')));

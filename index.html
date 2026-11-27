@@ -195,6 +195,10 @@ pre code{background:none;padding:0}
 .feedback p{margin-top:8px;max-width:68ch}
 .hint{background:var(--orange-soft);border:1px solid color-mix(in srgb,var(--orange) 45%,transparent);border-radius:12px;padding:10px 14px;margin:0 0 16px;animation:rise .25s}
 .note{font-size:.88rem;color:var(--ink-2);margin-top:10px}
+.sources{margin-top:12px;font-size:.95rem}
+.sources ul{margin:4px 0 0;padding-left:20px}
+.sources li{margin-bottom:4px;overflow-wrap:anywhere}
+.sources a{color:var(--blue)}
 .pill-bad{color:var(--bad);font-weight:700} .pill-good{color:var(--good);font-weight:700}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .actions .spacer{flex:1}
@@ -698,11 +702,16 @@ function slotRows(q,p){
     return `<li><b>${esc(s.label)}</b>: ${good?`<span class="pill-good">${esc(s.correct)}</span>`:`<span class="pill-bad">${esc(p[k]||'no answer')}</span>, correct: <b>${esc(s.correct)}</b>`}</li>`;
   }).join('')+`</ul>`;
 }
+// "Read on Microsoft Learn" links, shown only once the answer is revealed.
+function sourceLinks(q){
+  if(!q.sources||!q.sources.length) return '';
+  return `<div class="sources"><b>Read on Microsoft Learn</b><ul>${q.sources.map(s=>`<li><a href="${esc(s.url).replace(/"/g,'&quot;')}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></div>`;
+}
 function feedback(q,ok,p){
   const ans = q.type==='slots' ? slotRows(q,p) : `Correct answer: <b>${esc(q.correct.join(', '))}</b>`;
   return `<div class="feedback ${ok?'ok':'no'}"><div class="verdict ${ok?'ok':'no'}">${ok?'Correct':'Not quite'}</div><p>${ans}</p>
     ${q.rationale?`<p>${inline(q.rationale.replace(/\n+/g,' '))}</p>`:''}
-    ${q.note?`<p class="note">${inline(q.note)}</p>`:''}</div>`;
+    ${q.note?`<p class="note">${inline(q.note)}</p>`:''}${sourceLinks(q)}</div>`;
 }
 /* ---------- results ---------- */
 function fmtTime(ms){ const s=Math.floor(ms/1000); return Math.floor(s/60)+' min '+String(s%60).padStart(2,'0')+' s'; }
@@ -786,7 +795,7 @@ function reviewBody(x){
   if(q.rationale) h+=`<p><b>Why:</b> ${inline(q.rationale.replace(/\n+/g,' '))}</p>`;
   h+=`<div class="hint"><b>Concept:</b> ${inline(q.hint)}</div>`;
   if(q.note) h+=`<p class="note">${inline(q.note)}</p>`;
-  return h;
+  return h+sourceLinks(q);
 }
 /* ---------- theme (chosen by the user, default light) ---------- */
 const ICON_MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
