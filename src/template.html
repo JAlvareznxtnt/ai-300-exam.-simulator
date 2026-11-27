@@ -46,6 +46,22 @@ main{max-width:1080px;margin:0 auto;padding:28px 20px 72px}
 .stats{display:flex;flex-wrap:wrap;gap:10px;list-style:none;padding:0;margin:18px 0 0}
 .stats li{background:var(--mist);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:.95rem;color:var(--ink-2)}
 .stats b{font-family:var(--font-display);color:var(--ink);font-size:1.02rem;margin-right:4px}
+/* "Get started" guide: opens by growing its grid row from 0fr to 1fr; reduced motion just shows or hides it */
+.guide-wrap{display:flex;flex-direction:column;align-items:flex-start;margin-top:16px}
+#guide-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:999px}
+.ic{width:20px;height:20px;flex:none}
+#guide-toggle .chev{transition:transform .25s ease}
+#guide-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.guide{display:grid;grid-template-rows:0fr;width:100%;opacity:0;visibility:hidden;transition:grid-template-rows .25s ease,opacity .25s ease,visibility 0s linear .25s}
+.guide.open{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows .25s ease,opacity .25s ease,visibility 0s}
+.guide-clip{min-height:0;overflow:hidden}
+.steps{list-style:none;margin:0;padding:16px 0 0;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:760px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.step{background:var(--mist);border-radius:16px;padding:16px}
+.step>.ic{width:24px;height:24px}
+.step h2{font-size:1.05rem;margin:8px 0}
+.step ul{margin:0;padding-left:20px;color:var(--ink-2)}
+.step li+li{margin-top:8px}
 .setup-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;margin-top:28px;align-items:start}
 @media (min-width:920px){.setup-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
 .panel-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:24px}
@@ -330,6 +346,24 @@ function poolFor(doms,withSyn){
   return DATA.filter(q=>doms.includes(q.dom)).concat(withSyn?SYN.normal.filter(q=>doms.includes(q.dom)):[]);
 }
 function modeNow(){ const m=app.querySelector('input[name=mode]:checked'); return m?m.value:'practice'; }
+/* "Get started" guide. One icon set: 24px grid, 2px current-color strokes. */
+const icon=(paths,cls)=>`<svg class="ic${cls?' '+cls:''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+const GUIDE=[
+  {title:'Choose how to practice',icon:'<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
+   points:['Take a full exam simulation','Pick one domain, or set the number of questions','Try a case study or a Yes/No series']},
+  {title:'Answer',icon:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+   points:['Practice: check answers when you want. Exam mode and the simulation: results at the end','Use Review to jump to any question','Ordering and matching questions are drag-and-drop; tapping works too']},
+  {title:'Review',icon:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M8.500 11l2 2 3.500-4"/>',
+   points:['See what you missed, and why','Open the Microsoft Learn links on checked questions','The orange <span class="tag syn-badge">Synthetic</span> tag marks questions written for practice']}
+];
+function guideHtml(){
+  return `<div class="guide-wrap">
+    <button type="button" id="guide-toggle" aria-expanded="false" aria-controls="guide">${icon('<circle cx="12" cy="12" r="9"/><path d="M10 8.500l6 3.500-6 3.500z"/>')}<span>Get started</span>${icon('<path d="M6 9l6 6 6-6"/>','chev')}</button>
+    <div class="guide" id="guide" inert><div class="guide-clip"><ol class="steps">
+      ${GUIDE.map(s=>`<li class="step">${icon(s.icon)}<h2>${s.title}</h2><ul>${s.points.map(t=>`<li>${t}</li>`).join('')}</ul></li>`).join('')}
+    </ol></div></div>
+  </div>`;
+}
 function showSetup(prev){
   if(S&&S.timer){clearInterval(S.timer);S.timer=null;}
   S=null;
@@ -342,6 +376,7 @@ function showSetup(prev){
       <p class="lead">Train on ${DATA.length} questions from the question bank, or on ${SYN_TOTAL} synthetic questions in the exam's own formats. Nothing is saved, so every session starts fresh.</p>
       <ul class="stats"><li><b>${DATA.length}</b>bank questions</li><li><b>${SYN_TOTAL}</b>synthetic questions</li><li><b>5</b>exam domains</li></ul>
     </section>
+    ${guideHtml()}
     <div class="setup-grid">
       <section class="panel-card" aria-labelledby="bankh">
         <header><h2 id="bankh">Question bank</h2><p class="help">Real-style questions grouped by exam domain. Pick what to practice and how.</p></header>
@@ -412,6 +447,9 @@ function showSetup(prev){
     document.getElementById('simsm').textContent=on?'Singles, a Yes/No series and a case study, all synthetic.':'Original bank questions only. Series and case studies exist only as synthetic, so they are left out.';
     document.getElementById('sim').textContent='Start exam simulation ('+(on?simN:50)+' questions)';
   };
+  // The guide starts closed on every visit to this screen; inert keeps it away from keyboard and screen readers.
+  const toggle=document.getElementById('guide-toggle'), guide=document.getElementById('guide');
+  toggle.onclick=()=>{ const open=toggle.getAttribute('aria-expanded')!=='true'; toggle.setAttribute('aria-expanded',open); guide.classList.toggle('open',open); guide.inert=!open; };
   document.getElementById('simsyn').addEventListener('change',simUpd);
   app.querySelectorAll('#doms input').forEach(c=>c.addEventListener('change',upd));
   document.getElementById('syn').addEventListener('change',upd);

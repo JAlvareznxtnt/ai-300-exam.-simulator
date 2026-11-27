@@ -342,6 +342,37 @@ const URL = require('url').pathToFileURL(path.join(__dirname, '..', 'dist', 'ind
   v=check('questions.json',d=>{ d[0].sources=[{title:'x',url:'https://example.com/'}]; }); assert.strictEqual(v.status,1,'bank sources are checked too');
   fs.rmSync(tmp,{recursive:true,force:true});
   console.log('validator ok');
+  // "Get started" guide: a button, collapsed on every load, hidden from keyboard and screen readers while closed
+  await p.goto(URL);
+  const guide=()=>p.evaluate(()=>{ const t=document.getElementById('guide-toggle'), g=document.getElementById('guide');
+    return {tag:t.tagName,controls:t.getAttribute('aria-controls'),expanded:t.getAttribute('aria-expanded'),inert:g.hasAttribute('inert'),visibility:getComputedStyle(g).visibility,shown:g.offsetHeight>0}; });
+  const canFocus=()=>p.evaluate(()=>{ const probe=document.createElement('button'); document.querySelector('#guide .step').append(probe); probe.focus(); const ok=document.activeElement===probe; probe.remove(); return ok; });
+  const heading=()=>p.getByRole('heading',{name:'Choose how to practice'}).count();
+  const closed={tag:'BUTTON',controls:'guide',expanded:'false',inert:true,visibility:'hidden',shown:false};
+  const opened={tag:'BUTTON',controls:'guide',expanded:'true',inert:false,visibility:'visible',shown:true};
+  assert.deepStrictEqual(await guide(),closed);
+  assert.strictEqual(await canFocus(),false,'collapsed content is not focusable'); assert.strictEqual(await heading(),0);
+  await p.focus('#guide-toggle'); await p.keyboard.press('Tab');
+  assert.strictEqual(await p.evaluate(()=>!!document.activeElement.closest('#guide')),false);
+  await p.click('#guide-toggle'); await p.waitForTimeout(400);
+  assert.deepStrictEqual(await guide(),opened); assert.strictEqual(await canFocus(),true); assert.strictEqual(await heading(),1);
+  const steps=await p.$$eval('#guide .step',els=>els.map(e=>({title:e.querySelector('h2').textContent,points:e.querySelectorAll('li').length,
+    icon:[...e.querySelectorAll(':scope>svg')].map(s=>s.getAttribute('stroke')+' '+s.getAttribute('stroke-width'))})));
+  assert.deepStrictEqual(steps.map(s=>s.title),['Choose how to practice','Answer','Review']);
+  steps.forEach(s=>{ assert.ok(s.points>=2&&s.points<=3,s.title); assert.deepStrictEqual(s.icon,['currentColor 2']); });
+  assert.strictEqual(await count('#guide .step .syn-badge'),1); assert.strictEqual(await wide(),false,'no horizontal scroll with the guide open');
+  await p.focus('#guide-toggle'); await p.keyboard.press('Enter'); await p.waitForTimeout(400); assert.deepStrictEqual(await guide(),closed);
+  await p.keyboard.press('Space'); await p.waitForTimeout(400); assert.deepStrictEqual(await guide(),opened);
+  await p.goto(URL); assert.deepStrictEqual(await guide(),closed,'collapsed again on load');
+  await p.click('#guide-toggle'); await p.click('#start'); await p.click('#quit'); await p.click('#again');
+  assert.deepStrictEqual(await guide(),closed,'collapsed again after returning to setup');
+  assert.strictEqual(await p.evaluate(()=>Object.keys(localStorage).filter(k=>k!=='ai300-theme').length),0,'nothing stored');
+  // reduced motion: no animation, the guide is simply there
+  const calm=await b.newContext({viewport:{width:420,height:900},reducedMotion:'reduce'}); const q2=await calm.newPage(); await q2.goto(URL);
+  await q2.click('#guide-toggle');
+  assert.deepStrictEqual(await q2.$eval('#guide',e=>[getComputedStyle(e).transitionDuration,e.offsetHeight===e.scrollHeight&&e.offsetHeight>0]),['0s',true]);
+  await calm.close();
+  console.log('guide ok');
   // dropdown checks
   await p.goto(URL);
   console.log('domains open?',await p.evaluate(()=>document.getElementById('domdrop').open),'| summary:',(await p.textContent('#domsum')));

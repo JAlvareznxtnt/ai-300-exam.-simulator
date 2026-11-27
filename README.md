@@ -3,6 +3,7 @@
 A private, single-page practice app for the Microsoft AI-300 exam. No accounts, no backend, nothing is saved: every session starts fresh.
 
 ## What is in it
+- **Get started**: a short three-step guide on the setup screen, closed until you open it.
 - **Question bank**: 80 questions across the five exam domains (single choice, choose 2, and drag-and-drop questions for ordering, matching and code blanks). Practice mode (check answers when you want) or Exam mode (results at the end, you can go back).
 - **Exam simulation**: 50 questions in the exam's domain mix, plus a Yes/No series and a case study when synthetic questions are on. Clock, no hints, results at the end. A toggle switches to original bank questions only (50, no series or case study).
 - **Synthetic practice**: 3 case studies (5 questions each), 2 Yes/No series (3 each) and 50 single questions. Written by Claude from the official skills outline and checked against Microsoft docs where they cover the topic. Always tagged orange "Synthetic".
